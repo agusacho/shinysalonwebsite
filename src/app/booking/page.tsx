@@ -9,6 +9,8 @@ import confetti from "canvas-confetti";
 import { Check, ChevronRight, ChevronLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { insforge } from "@/lib/insforge";
+import { createBrowserClient } from "@insforge/sdk/ssr";
+import { useEffect } from "react";
 
 const steps = ["Service", "Stylist", "Date & Time", "Confirm"];
 
@@ -25,12 +27,28 @@ export default function Booking() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    const client = createBrowserClient({
+      baseUrl: process.env.NEXT_PUBLIC_INSFORGE_URL!,
+      anonKey: process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY!,
+    });
+    client.auth.getCurrentUser().then(({ data, error }) => {
+      if (!error && data?.user) {
+        setSelections(s => ({
+          ...s,
+          name: data.user?.profile?.name || "Guest",
+          email: data.user?.email || "guest@example.com"
+        }));
+      }
+    });
+  }, []);
+
   const nextStep = async () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(c => c + 1);
     } else {
       setIsSubmitting(true);
-      const { error } = await insforge.from('bookings').insert([{
+      const { error } = await insforge.database.from('bookings').insert([{
         service_id: selections.service,
         date: selections.date,
         time: selections.time || "TBD",

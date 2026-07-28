@@ -25,7 +25,7 @@ export default function Contact() {
   });
 
   const onSubmit = async (data: FormData) => {
-    const { error } = await insforge.from('contact_submissions').insert([{
+    const { error } = await insforge.database.from('contact_submissions').insert([{
       name: data.name,
       email: data.email,
       message: data.message
