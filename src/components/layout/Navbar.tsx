@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 
@@ -19,7 +20,8 @@ export const Navbar = () => {
   return (
     <header className="fixed top-0 w-full z-40 bg-background/80 backdrop-blur-md border-b border-peach-base">
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-        <Link href="/" className="font-serif text-2xl tracking-widest text-gold-gradient font-bold">
+        <Link href="/" className="flex items-center gap-3 font-serif text-2xl tracking-widest text-gold-gradient font-bold">
+          <Image src="/logo.png" alt="Shiny Salon Logo" width={48} height={48} className="object-contain drop-shadow-md" />
           SHINY SALON
         </Link>
 
