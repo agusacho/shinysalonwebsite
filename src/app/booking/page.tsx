@@ -50,14 +50,19 @@ export default function Booking() {
       setCurrentStep(c => c + 1);
     } else {
       setIsSubmitting(true);
-      const { error } = await insforge.database.from('bookings').insert([{
+      const client = createBrowserClient({
+        baseUrl: process.env.NEXT_PUBLIC_INSFORGE_URL!,
+        anonKey: process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY!,
+      });
+      const { error } = await client.database.from('bookings').insert([{
         service_id: selections.service,
         date: selections.date,
         time: selections.time || "TBD",
         name: selections.name,
         email: selections.email,
         phone: selections.phone,
-        user_id: selections.userId
+        user_id: selections.userId,
+        stylist: selections.stylist
       }]);
       setIsSubmitting(false);
 
