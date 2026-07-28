@@ -42,8 +42,11 @@ export const Navbar = () => {
   };
 
   return (
-    <header className="fixed top-0 w-full z-40 bg-background/80 backdrop-blur-md border-b border-peach-base">
-      <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+    <header className="fixed top-0 w-full z-40 bg-background/80 backdrop-blur-md border-b border-peach-base flex flex-col">
+      <div className="bg-charcoal text-white text-xs text-center py-1.5 w-full flex items-center justify-center font-sans tracking-wider">
+         SHINY SALON | WA: 085811467467
+      </div>
+      <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between w-full">
         <Link href="/" className="flex items-center gap-3 font-serif text-2xl tracking-widest text-gold-gradient font-bold">
           <Image src="/logo.png" alt="Shiny Salon Logo" width={48} height={48} className="object-contain drop-shadow-md" />
           SHINY SALON & SPA

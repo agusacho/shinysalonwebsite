@@ -25,9 +25,9 @@ export default function Home() {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { title: "Hair Styling", desc: "Precision cuts, balayage, and luxurious blowouts." },
-              { title: "Skin Care", desc: "Rejuvenating facials and advanced skin treatments." },
-              { title: "Nail Studio", desc: "Bespoke manicures and pedicures with premium lacquers." }
+              { title: "Hair Services", desc: "Potong, Cuci, Blow, Creambath, Hair Mask & Hair Spa." },
+              { title: "Keratin Treat", desc: "Perawatan Keratin Smoothing dan Filler untuk rambut sehat berkilau." },
+              { title: "Colouring", desc: "Bleaching, Peakaboo, Highlight, dan Ombre dengan hasil memukau." }
             ].map((service, i) => (
               <Reveal key={i} delay={i * 0.2}>
                 <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-lg transition-shadow border border-peach-base group relative overflow-hidden">
