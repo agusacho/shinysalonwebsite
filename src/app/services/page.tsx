@@ -12,18 +12,18 @@ const services = [
   {
     category: "Hair Services",
     items: [
-      { id: "h1", name: "Potong + Cuci + Blow + Tonic + Vit", price: "40K", description: "Complete haircut package for a refreshed look." },
-      { id: "h2", name: "Cuci + Blow + Tonic + Vit", price: "30K", description: "Refreshing wash and professional blowout." },
-      { id: "h3", name: "Cuci + Catok + Tonic + Vit", price: "40K-50K", description: "Wash and flat iron styling for sleek straight hair." },
-      { id: "h4", name: "Creambath + Blow + Tonic + Vit", price: "60K", description: "Deep conditioning creambath treatment." },
-      { id: "h5", name: "Hair Mask + Blow + Tonic + Vit", price: "70K", description: "Intensive hair mask for damaged or dry hair." },
-      { id: "h6", name: "Hair Spa + Blow + Tonic + Vit", price: "85K", description: "Luxurious spa treatment for ultimate hair rejuvenation." },
+      { id: "h1", name: "Potong+Cuci+Blow+Tonic+Vit", price: "40K", description: "Complete haircut package for a refreshed look." },
+      { id: "h2", name: "Cuci+Blow+Tonic+Vit", price: "30K", description: "Refreshing wash and professional blowout." },
+      { id: "h3", name: "Cuci+Catok+Tonic+Vit", price: "40K-50K", description: "Wash and flat iron styling for sleek straight hair." },
+      { id: "h4", name: "Creambath+Blow+Tonic+Vit", price: "60K", description: "Deep conditioning creambath treatment." },
+      { id: "h5", name: "Hair Mask+Blow+Tonic+Vit", price: "70K", description: "Intensive hair mask for damaged or dry hair." },
+      { id: "h6", name: "Hair Spa+Blow+Tonic+Vit", price: "85K", description: "Luxurious spa treatment for ultimate hair rejuvenation." },
     ]
   },
   {
     category: "Keratin Treat",
     items: [
-      { id: "k1", name: "Hair Mask Keratin + Blow + Tonic + Vit", price: "80K", description: "Keratin infused mask for smooth and manageable hair." },
+      { id: "k1", name: "Hair Mask Keratin+Blow+Tonic+Vit", price: "80K", description: "Keratin infused mask for smooth and manageable hair." },
       { id: "k2", name: "Smoothing Keratin Short", price: "300K-400K", description: "Keratin smoothing treatment for short hair." },
       { id: "k3", name: "Smoothing Keratin Medium", price: "400K-500K", description: "Keratin smoothing treatment for medium length hair." },
       { id: "k4", name: "Smoothing Keratin Long", price: "500K-600K", description: "Keratin smoothing treatment for long hair." },
