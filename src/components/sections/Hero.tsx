@@ -4,6 +4,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
+import Image from "next/image";
 
 const textToType = "Luminous Elegance.".split("");
 
@@ -17,7 +18,21 @@ export const Hero = () => {
         <div className="absolute inset-0 bg-off-white bg-gradient-to-tr from-peach-base/20 to-white z-0" />
       </div>
 
-      <div className="relative z-20 max-w-5xl mx-auto px-6 text-center mt-20">
+      <div className="relative z-20 max-w-5xl mx-auto px-6 text-center mt-20 flex flex-col items-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8, y: -20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 1.2, ease: "easeOut" }}
+          className="mb-8"
+        >
+          <motion.div
+            animate={{ y: [0, -10, 0] }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <Image src="/logo.png" alt="Shiny Salon Emblem" width={120} height={120} className="object-contain drop-shadow-2xl" />
+          </motion.div>
+        </motion.div>
+
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

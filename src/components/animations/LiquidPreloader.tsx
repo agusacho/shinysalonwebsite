@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 
 export const LiquidPreloader = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -43,15 +44,14 @@ export const LiquidPreloader = () => {
             }}
             className="w-48 h-48 bg-gold-gradient shadow-[0_0_40px_rgba(212,175,55,0.6)] flex items-center justify-center"
           >
-            {/* Logo Text that fades in as blob resolves */}
-            <motion.span
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.5, duration: 0.5 }}
-              className="text-white font-serif text-4xl font-bold tracking-widest drop-shadow-md"
+            {/* Logo Image that fades in as blob resolves */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 1.5, duration: 0.5, type: "spring" }}
             >
-              S
-            </motion.span>
+              <Image src="/logo.png" alt="Shiny Salon Logo" width={80} height={80} className="object-contain drop-shadow-2xl" />
+            </motion.div>
           </motion.div>
         </motion.div>
       )}
