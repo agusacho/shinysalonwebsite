@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
+import { insforge } from "@/lib/insforge";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -24,9 +25,16 @@ export default function Contact() {
   });
 
   const onSubmit = async (data: FormData) => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    console.log(data);
+    const { error } = await insforge.from('contact_submissions').insert([{
+      name: data.name,
+      email: data.email,
+      message: data.message
+    }]);
+
+    if (error) {
+      console.error("Failed to submit contact form:", error);
+      throw error;
+    }
   };
 
   return (

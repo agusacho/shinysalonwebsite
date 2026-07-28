@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import { Check, ChevronRight, ChevronLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { insforge } from "@/lib/insforge";
 
 const steps = ["Service", "Stylist", "Date & Time", "Confirm"];
 
@@ -17,12 +18,34 @@ export default function Booking() {
     service: "",
     stylist: "",
     date: "",
+    time: "",
+    name: "Guest",
+    email: "guest@example.com",
+    phone: "1234567890"
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const nextStep = () => {
+  const nextStep = async () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(c => c + 1);
     } else {
+      setIsSubmitting(true);
+      const { error } = await insforge.from('bookings').insert([{
+        service_id: selections.service,
+        date: selections.date,
+        time: selections.time || "TBD",
+        name: selections.name,
+        email: selections.email,
+        phone: selections.phone
+      }]);
+      setIsSubmitting(false);
+
+      if (error) {
+        console.error("Booking error:", error);
+        alert("Failed to confirm booking.");
+        return;
+      }
+
       // Final confirm
       confetti({
         particleCount: 150,
@@ -94,7 +117,13 @@ export default function Booking() {
             {selections.date && (
               <div className="grid grid-cols-3 gap-3">
                 {["10:00 AM", "11:30 AM", "2:00 PM", "4:15 PM"].map(time => (
-                  <div key={time} className="p-3 border rounded-lg text-center text-sm font-sans cursor-pointer hover:border-gold-metallic">
+                  <div 
+                    key={time} 
+                    onClick={() => setSelections({...selections, time})}
+                    className={cn(
+                      "p-3 border rounded-lg text-center text-sm font-sans cursor-pointer hover:border-gold-metallic",
+                      selections.time === time ? "border-gold-metallic bg-gold-metallic/5" : "border-gray-200"
+                    )}>
                     {time}
                   </div>
                 ))}
@@ -115,9 +144,13 @@ export default function Booking() {
                 <span>Stylist</span>
                 <span className="font-medium text-charcoal">{selections.stylist || "Not selected"}</span>
               </div>
-              <div className="flex justify-between pb-2">
+              <div className="flex justify-between border-b border-gray-200 pb-2">
                 <span>Date</span>
                 <span className="font-medium text-charcoal">{selections.date || "Not selected"}</span>
+              </div>
+              <div className="flex justify-between pb-2">
+                <span>Time</span>
+                <span className="font-medium text-charcoal">{selections.time || "Not selected"}</span>
               </div>
             </div>
           </div>
@@ -192,8 +225,8 @@ export default function Booking() {
                   >
                     <ChevronLeft size={18} /> Back
                   </Button>
-                  <Button onClick={nextStep}>
-                    {currentStep === steps.length - 1 ? "Confirm Booking" : "Continue"} <ChevronRight size={18} />
+                  <Button onClick={nextStep} disabled={isSubmitting}>
+                    {isSubmitting ? "Booking..." : (currentStep === steps.length - 1 ? "Confirm Booking" : "Continue")} <ChevronRight size={18} />
                   </Button>
                 </div>
               </div>
