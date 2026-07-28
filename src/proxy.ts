@@ -2,12 +2,20 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { updateSession } from '@insforge/sdk/ssr';
 
 export default async function proxy(request: NextRequest) {
-  // updateSession handles refreshing the access token if needed
-  // and returning the updated response with cookies.
-  return await updateSession(request, {
-    baseUrl: process.env.NEXT_PUBLIC_INSFORGE_URL!,
-    anonKey: process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY!
+  const response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
   });
+
+  await updateSession({
+    baseUrl: process.env.NEXT_PUBLIC_INSFORGE_URL!,
+    anonKey: process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY!,
+    requestCookies: request.cookies,
+    responseCookies: response.cookies
+  });
+
+  return response;
 }
 
 export const config = {

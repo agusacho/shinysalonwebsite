@@ -23,7 +23,8 @@ export default function Booking() {
     time: "",
     name: "Guest",
     email: "guest@example.com",
-    phone: "1234567890"
+    phone: "1234567890",
+    userId: null as string | null
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -37,7 +38,8 @@ export default function Booking() {
         setSelections(s => ({
           ...s,
           name: data.user?.profile?.name || "Guest",
-          email: data.user?.email || "guest@example.com"
+          email: data.user?.email || "guest@example.com",
+          userId: data.user?.id || null
         }));
       }
     });
@@ -54,7 +56,8 @@ export default function Booking() {
         time: selections.time || "TBD",
         name: selections.name,
         email: selections.email,
-        phone: selections.phone
+        phone: selections.phone,
+        user_id: selections.userId
       }]);
       setIsSubmitting(false);
 

@@ -59,11 +59,14 @@ export const Navbar = () => {
           ))}
           
           {user ? (
-            <div className="flex items-center gap-4 border-l pl-8 border-gray-200">
-              <span className="text-sm font-medium flex items-center gap-2">
+            <div className="flex items-center gap-6 border-l pl-8 border-gray-200">
+              <Link href="/my-bookings" className="text-sm font-medium hover:text-gold-metallic transition-colors">
+                My Bookings
+              </Link>
+              <span className="text-sm font-medium flex items-center gap-2 text-charcoal">
                 <User size={16} /> {user.profile?.name || user.email}
               </span>
-              <button onClick={handleLogout} className="text-sm text-gray-500 hover:text-charcoal transition-colors">
+              <button onClick={handleLogout} className="text-sm text-gray-500 hover:text-red-500 transition-colors">
                 Logout
               </button>
             </div>
@@ -114,9 +117,12 @@ export const Navbar = () => {
               <span className="text-lg font-sans text-charcoal flex items-center gap-2">
                 <User size={18} /> {user.profile?.name || user.email}
               </span>
+              <Link href="/my-bookings" onClick={() => setIsOpen(false)} className="text-lg font-sans text-charcoal hover:text-gold-metallic">
+                My Bookings
+              </Link>
               <button 
                 onClick={() => { handleLogout(); setIsOpen(false); }}
-                className="text-left text-lg font-sans text-gray-500 hover:text-charcoal"
+                className="text-left text-lg font-sans text-red-500 hover:text-red-600"
               >
                 Logout
               </button>
