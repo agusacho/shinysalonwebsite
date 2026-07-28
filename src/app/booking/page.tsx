@@ -1,18 +1,40 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Reveal } from "@/components/animations/Reveal";
 import { Button } from "@/components/ui/Button";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
-import { Check, ChevronRight, ChevronLeft } from "lucide-react";
+import { Check, ChevronRight, ChevronLeft, AlertCircle, User, Mail, Phone } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { insforge } from "@/lib/insforge";
 import { createBrowserClient } from "@insforge/sdk/ssr";
-import { useEffect } from "react";
 
-const steps = ["Service", "Stylist", "Date & Time", "Confirm"];
+const steps = ["Service", "Stylist", "Date & Time", "Your Info", "Confirm"];
+
+const SERVICES = [
+  { name: "Potong+Cuci+Blow+Tonic+Vit", price: "40K", category: "Hair Services" },
+  { name: "Cuci+Blow+Tonic+Vit", price: "30K", category: "Hair Services" },
+  { name: "Cuci+Catok+Tonic+Vit", price: "40K-50K", category: "Hair Services" },
+  { name: "Creambath+Blow+Tonic+Vit", price: "60K", category: "Hair Services" },
+  { name: "Hair Mask+Blow+Tonic+Vit", price: "70K", category: "Hair Services" },
+  { name: "Hair Spa+Blow+Tonic+Vit", price: "85K", category: "Hair Services" },
+  { name: "Hair Mask Keratin+Blow+Tonic+Vit", price: "80K", category: "Keratin Treat" },
+  { name: "Smoothing Keratin Short", price: "300K-400K", category: "Keratin Treat" },
+  { name: "Smoothing Keratin Medium", price: "400K-500K", category: "Keratin Treat" },
+  { name: "Smoothing Keratin Long", price: "500K-600K", category: "Keratin Treat" },
+  { name: "Filler Keratin", price: "350K-650K", category: "Keratin Treat" },
+  { name: "Bleaching all Hair", price: "150K-300K", category: "Colouring" },
+  { name: "Colouring all Hair", price: "120K-300K", category: "Colouring" },
+  { name: "Peakaboo or Highlight", price: "220K-450K", category: "Colouring" },
+  { name: "Ombre", price: "250K-500K", category: "Colouring" },
+];
+
+const STYLISTS = [
+  { name: "Shiny Team", initial: "S" },
+];
+
+const TIMES = ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00"];
 
 export default function Booking() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -21,172 +43,276 @@ export default function Booking() {
     stylist: "",
     date: "",
     time: "",
-    name: "Guest",
-    email: "guest@example.com",
-    phone: "1234567890",
-    userId: null as string | null
+    name: "",
+    email: "",
+    phone: "",
+    userId: null as string | null,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [submitError, setSubmitError] = useState("");
 
   useEffect(() => {
     const client = createBrowserClient({
       baseUrl: process.env.NEXT_PUBLIC_INSFORGE_URL!,
       anonKey: process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY!,
     });
-    client.auth.getCurrentUser().then(({ data, error }) => {
-      if (!error && data?.user) {
+    client.auth.getCurrentUser().then(({ data }) => {
+      if (data?.user) {
         setSelections(s => ({
           ...s,
-          name: data.user?.profile?.name || "Guest",
-          email: data.user?.email || "guest@example.com",
-          userId: data.user?.id || null
+          name: data.user?.profile?.name || "",
+          email: data.user?.email || "",
+          userId: data.user?.id || null,
         }));
       }
     });
   }, []);
 
+  const validate = (): boolean => {
+    setError("");
+    switch (currentStep) {
+      case 0:
+        if (!selections.service) { setError("Silakan pilih layanan terlebih dahulu."); return false; }
+        break;
+      case 1:
+        if (!selections.stylist) { setError("Silakan pilih stylist terlebih dahulu."); return false; }
+        break;
+      case 2:
+        if (!selections.date) { setError("Silakan pilih tanggal."); return false; }
+        if (!selections.time) { setError("Silakan pilih jam."); return false; }
+        break;
+      case 3:
+        if (!selections.name.trim()) { setError("Nama tidak boleh kosong."); return false; }
+        if (!selections.email.trim() || !/\S+@\S+\.\S+/.test(selections.email)) { setError("Masukkan email yang valid."); return false; }
+        if (!selections.phone.trim() || selections.phone.length < 8) { setError("Masukkan nomor WhatsApp yang valid."); return false; }
+        break;
+    }
+    return true;
+  };
+
   const nextStep = async () => {
+    if (!validate()) return;
+
     if (currentStep < steps.length - 1) {
       setCurrentStep(c => c + 1);
     } else {
       setIsSubmitting(true);
-      const client = createBrowserClient({
-        baseUrl: process.env.NEXT_PUBLIC_INSFORGE_URL!,
-        anonKey: process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY!,
-      });
-      const { error } = await client.database.from('bookings').insert([{
-        service_id: selections.service,
-        date: selections.date,
-        time: selections.time || "TBD",
-        name: selections.name,
-        email: selections.email,
-        phone: selections.phone,
-        user_id: selections.userId,
-        stylist: selections.stylist
-      }]);
-      setIsSubmitting(false);
+      setSubmitError("");
+      try {
+        const client = createBrowserClient({
+          baseUrl: process.env.NEXT_PUBLIC_INSFORGE_URL!,
+          anonKey: process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY!,
+        });
+        const { error: insertError } = await client.database.from("bookings").insert([{
+          service_id: selections.service,
+          date: selections.date,
+          time: selections.time,
+          name: selections.name,
+          email: selections.email,
+          phone: selections.phone,
+          user_id: selections.userId,
+          stylist: selections.stylist,
+          status: "pending",
+        }]);
 
-      if (error) {
-        console.error("Booking error:", error);
-        alert("Failed to confirm booking.");
-        return;
+        if (insertError) {
+          console.error("Booking insert error:", insertError);
+          setSubmitError("Gagal menyimpan booking. Silakan coba lagi.");
+          return;
+        }
+
+        confetti({
+          particleCount: 150,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ["#D4AF37", "#FADADD", "#D99058", "#FFFFFF"],
+        });
+        setCurrentStep(c => c + 1);
+      } catch (e) {
+        console.error(e);
+        setSubmitError("Terjadi kesalahan. Silakan coba lagi.");
+      } finally {
+        setIsSubmitting(false);
       }
-
-      // Final confirm
-      confetti({
-        particleCount: 150,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ["#D4AF37", "#FADADD", "#D99058", "#FFFFFF"]
-      });
-      setCurrentStep(c => c + 1); // Move to success view
     }
   };
 
   const prevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(c => c - 1);
-    }
+    setError("");
+    if (currentStep > 0) setCurrentStep(c => c - 1);
   };
+
+  const groupedServices = SERVICES.reduce<Record<string, typeof SERVICES>>((acc, svc) => {
+    if (!acc[svc.category]) acc[svc.category] = [];
+    acc[svc.category].push(svc);
+    return acc;
+  }, {});
+
+  const today = new Date().toISOString().split("T")[0];
 
   const renderStepContent = () => {
     switch (currentStep) {
       case 0:
         return (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-            {[
-              "Potong+Cuci+Blow+Tonic+Vit", "Cuci+Blow+Tonic+Vit", "Cuci+Catok+Tonic+Vit",
-              "Creambath+Blow+Tonic+Vit", "Hair Mask+Blow+Tonic+Vit", "Hair Spa+Blow+Tonic+Vit",
-              "Hair Mask Keratin+Blow+Tonic+Vit", "Smoothing Keratin Short", "Smoothing Keratin Medium",
-              "Smoothing Keratin Long", "Filler Keratin", "Bleaching all Hair", "Colouring all Hair", 
-              "Peakaboo or Highlight", "Ombre"
-            ].map(svc => (
-              <div 
-                key={svc}
-                onClick={() => setSelections({...selections, service: svc})}
-                className={cn(
-                  "p-4 rounded-xl border cursor-pointer transition-all hover:shadow-md",
-                  selections.service === svc ? "border-gold-metallic bg-gold-metallic/5" : "border-gray-200 bg-white"
-                )}
-              >
-                <h4 className="font-sans font-medium text-charcoal">{svc}</h4>
+          <div className="space-y-6 max-h-[420px] overflow-y-auto pr-1">
+            {Object.entries(groupedServices).map(([cat, items]) => (
+              <div key={cat}>
+                <p className="text-xs font-bold tracking-widest text-peach-deep uppercase mb-2">{cat}</p>
+                <div className="space-y-2">
+                  {items.map(svc => (
+                    <div
+                      key={svc.name}
+                      onClick={() => setSelections({ ...selections, service: svc.name })}
+                      className={cn(
+                        "flex justify-between items-center p-4 rounded-xl border cursor-pointer transition-all hover:shadow-md",
+                        selections.service === svc.name ? "border-gold-metallic bg-gold-metallic/5 shadow-md" : "border-gray-200 bg-white"
+                      )}
+                    >
+                      <h4 className="font-sans font-medium text-charcoal text-sm">{svc.name}</h4>
+                      <span className={cn("font-bold font-sans text-sm ml-4 shrink-0", selections.service === svc.name ? "text-gold-metallic" : "text-peach-deep")}>
+                        Rp {svc.price}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
         );
+
       case 1:
         return (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {["Elena Rossi", "Marcus Chen", "Sarah Jenkins"].map(stylist => (
-              <div 
-                key={stylist}
-                onClick={() => setSelections({...selections, stylist})}
+          <div className="grid grid-cols-1 gap-4">
+            {STYLISTS.map(stylist => (
+              <div
+                key={stylist.name}
+                onClick={() => setSelections({ ...selections, stylist: stylist.name })}
                 className={cn(
-                  "p-4 rounded-xl border cursor-pointer transition-all hover:shadow-md text-center",
-                  selections.stylist === stylist ? "border-gold-metallic bg-gold-metallic/5" : "border-gray-200 bg-white"
+                  "flex items-center gap-4 p-5 rounded-xl border cursor-pointer transition-all hover:shadow-md",
+                  selections.stylist === stylist.name ? "border-gold-metallic bg-gold-metallic/5" : "border-gray-200 bg-white"
                 )}
               >
-                <div className="w-16 h-16 bg-peach-base/40 rounded-full mx-auto mb-3 flex items-center justify-center font-serif text-xl text-gold-metallic">
-                  {stylist.charAt(0)}
+                <div className="w-14 h-14 bg-peach-base/40 rounded-full flex items-center justify-center font-serif text-xl text-gold-metallic shrink-0">
+                  {stylist.initial}
                 </div>
-                <h4 className="font-sans font-medium text-charcoal">{stylist}</h4>
+                <div>
+                  <h4 className="font-sans font-medium text-charcoal">{stylist.name}</h4>
+                  <p className="text-sm text-gray-500">Tersedia untuk semua layanan</p>
+                </div>
+                {selections.stylist === stylist.name && (
+                  <Check className="ml-auto text-gold-metallic" size={20} />
+                )}
               </div>
             ))}
           </div>
         );
+
       case 2:
         return (
-          <div className="space-y-4">
+          <div className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-charcoal mb-2">Select Date</label>
-              <input 
-                type="date" 
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:border-gold-metallic"
-                onChange={(e) => setSelections({...selections, date: e.target.value})}
+              <label className="block text-sm font-medium text-charcoal mb-2">Pilih Tanggal</label>
+              <input
+                type="date"
+                min={today}
+                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:border-gold-metallic font-sans"
+                onChange={e => setSelections({ ...selections, date: e.target.value, time: "" })}
                 value={selections.date}
               />
             </div>
             {selections.date && (
-              <div className="grid grid-cols-3 gap-3">
-                {["10:00 AM", "11:30 AM", "2:00 PM", "4:15 PM"].map(time => (
-                  <div 
-                    key={time} 
-                    onClick={() => setSelections({...selections, time})}
-                    className={cn(
-                      "p-3 border rounded-lg text-center text-sm font-sans cursor-pointer hover:border-gold-metallic",
-                      selections.time === time ? "border-gold-metallic bg-gold-metallic/5" : "border-gray-200"
-                    )}>
-                    {time}
-                  </div>
-                ))}
+              <div>
+                <label className="block text-sm font-medium text-charcoal mb-3">Pilih Jam</label>
+                <div className="grid grid-cols-4 gap-2">
+                  {TIMES.map(time => (
+                    <div
+                      key={time}
+                      onClick={() => setSelections({ ...selections, time })}
+                      className={cn(
+                        "p-3 border rounded-lg text-center text-sm font-sans cursor-pointer hover:border-gold-metallic transition-all",
+                        selections.time === time ? "border-gold-metallic bg-gold-metallic/5 font-bold text-gold-metallic" : "border-gray-200"
+                      )}
+                    >
+                      {time}
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
         );
+
       case 3:
         return (
-          <div className="bg-peach-base/20 p-6 rounded-2xl border border-peach-base/50">
-            <h4 className="text-xl font-serif text-charcoal mb-4">Appointment Summary</h4>
-            <div className="space-y-3 font-sans text-gray-700">
-              <div className="flex justify-between border-b border-gray-200 pb-2">
-                <span>Service</span>
-                <span className="font-medium text-charcoal">{selections.service || "Not selected"}</span>
-              </div>
-              <div className="flex justify-between border-b border-gray-200 pb-2">
-                <span>Stylist</span>
-                <span className="font-medium text-charcoal">{selections.stylist || "Not selected"}</span>
-              </div>
-              <div className="flex justify-between border-b border-gray-200 pb-2">
-                <span>Date</span>
-                <span className="font-medium text-charcoal">{selections.date || "Not selected"}</span>
-              </div>
-              <div className="flex justify-between pb-2">
-                <span>Time</span>
-                <span className="font-medium text-charcoal">{selections.time || "Not selected"}</span>
-              </div>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-charcoal mb-2 flex items-center gap-2">
+                <User size={15} /> Nama Lengkap
+              </label>
+              <input
+                type="text"
+                placeholder="Masukkan nama lengkap"
+                value={selections.name}
+                onChange={e => setSelections({ ...selections, name: e.target.value })}
+                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:border-gold-metallic font-sans"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-charcoal mb-2 flex items-center gap-2">
+                <Mail size={15} /> Alamat Email
+              </label>
+              <input
+                type="email"
+                placeholder="contoh@email.com"
+                value={selections.email}
+                onChange={e => setSelections({ ...selections, email: e.target.value })}
+                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:border-gold-metallic font-sans"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-charcoal mb-2 flex items-center gap-2">
+                <Phone size={15} /> No. WhatsApp
+              </label>
+              <input
+                type="tel"
+                placeholder="085xxxxxxxxx"
+                value={selections.phone}
+                onChange={e => setSelections({ ...selections, phone: e.target.value })}
+                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:border-gold-metallic font-sans"
+              />
             </div>
           </div>
         );
+
+      case 4:
+        return (
+          <div className="bg-peach-base/20 p-6 rounded-2xl border border-peach-base/50">
+            <h4 className="text-xl font-serif text-charcoal mb-4">Ringkasan Reservasi</h4>
+            <div className="space-y-3 font-sans text-gray-700 text-sm">
+              {[
+                { label: "Layanan", value: selections.service },
+                { label: "Stylist", value: selections.stylist },
+                { label: "Tanggal", value: selections.date },
+                { label: "Jam", value: selections.time },
+                { label: "Nama", value: selections.name },
+                { label: "Email", value: selections.email },
+                { label: "WhatsApp", value: selections.phone },
+              ].map(({ label, value }) => (
+                <div key={label} className="flex justify-between border-b border-gray-200 pb-2 last:border-0 last:pb-0">
+                  <span className="text-gray-500">{label}</span>
+                  <span className="font-medium text-charcoal text-right ml-4">{value || "—"}</span>
+                </div>
+              ))}
+            </div>
+            {submitError && (
+              <div className="mt-4 flex items-center gap-2 text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm">
+                <AlertCircle size={16} /> {submitError}
+              </div>
+            )}
+          </div>
+        );
+
       default:
         return null;
     }
@@ -195,21 +321,21 @@ export default function Booking() {
   return (
     <main className="min-h-screen bg-background relative overflow-hidden pb-24">
       <Navbar />
-      
+
       <section className="pt-32 pb-16 px-6 relative">
         <div className="max-w-3xl mx-auto">
           <Reveal>
             <div className="text-center mb-12">
-              <h1 className="text-4xl md:text-5xl font-serif text-charcoal font-bold mb-4">Book Your Experience</h1>
-              <p className="text-lg text-peach-deep font-sans">Secure your moment of luxury.</p>
+              <h1 className="text-4xl md:text-5xl font-serif text-charcoal font-bold mb-4">Buat Reservasi</h1>
+              <p className="text-lg text-peach-deep font-sans">Jadwalkan momen kecantikan Anda bersama Shiny Salon.</p>
             </div>
 
             {currentStep < steps.length ? (
               <div className="bg-white rounded-3xl shadow-lg border border-peach-base p-6 md:p-10">
                 {/* Progress Bar */}
                 <div className="mb-10 relative">
-                  <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-1 bg-gray-100 z-0 rounded-full overflow-hidden">
-                    <motion.div 
+                  <div className="absolute top-4 left-0 right-0 h-1 bg-gray-100 z-0 rounded-full overflow-hidden">
+                    <motion.div
                       className="h-full bg-gold-gradient"
                       initial={{ width: "0%" }}
                       animate={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
@@ -220,10 +346,12 @@ export default function Booking() {
                     {steps.map((step, index) => (
                       <div key={step} className="flex flex-col items-center">
                         <div className={cn(
-                          "w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors duration-500",
-                          index <= currentStep ? "bg-gold-metallic text-white" : "bg-white border-2 border-gray-200 text-gray-400"
+                          "w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-500",
+                          index < currentStep ? "bg-gold-metallic text-white scale-90" :
+                          index === currentStep ? "bg-gold-metallic text-white scale-110 shadow-md" :
+                          "bg-white border-2 border-gray-200 text-gray-400"
                         )}>
-                          {index < currentStep ? <Check size={16} /> : index + 1}
+                          {index < currentStep ? <Check size={14} /> : index + 1}
                         </div>
                         <span className="text-xs font-sans mt-2 text-gray-500 hidden md:block">{step}</span>
                       </div>
@@ -232,38 +360,50 @@ export default function Booking() {
                 </div>
 
                 {/* Step Content */}
-                <div className="min-h-[250px]">
+                <div className="min-h-[280px]">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={currentStep}
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -20 }}
-                      transition={{ duration: 0.3 }}
+                      transition={{ duration: 0.25 }}
                     >
                       <h3 className="text-2xl font-serif text-charcoal mb-6">{steps[currentStep]}</h3>
                       {renderStepContent()}
+
+                      {/* Inline validation error */}
+                      {error && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="mt-4 flex items-center gap-2 text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm"
+                        >
+                          <AlertCircle size={16} /> {error}
+                        </motion.div>
+                      )}
                     </motion.div>
                   </AnimatePresence>
                 </div>
 
                 {/* Navigation */}
-                <div className="flex justify-between mt-10 pt-6 border-t border-gray-100">
-                  <Button 
-                    variant="outline" 
-                    onClick={prevStep} 
+                <div className="flex justify-between mt-8 pt-6 border-t border-gray-100">
+                  <Button
+                    variant="outline"
+                    onClick={prevStep}
                     disabled={currentStep === 0}
                     className={currentStep === 0 ? "opacity-0 pointer-events-none" : ""}
                   >
-                    <ChevronLeft size={18} /> Back
+                    <ChevronLeft size={18} /> Kembali
                   </Button>
                   <Button onClick={nextStep} disabled={isSubmitting}>
-                    {isSubmitting ? "Booking..." : (currentStep === steps.length - 1 ? "Confirm Booking" : "Continue")} <ChevronRight size={18} />
+                    {isSubmitting ? "Memproses..." : (currentStep === steps.length - 1 ? "Konfirmasi Booking" : "Lanjut")}
+                    {!isSubmitting && <ChevronRight size={18} />}
                   </Button>
                 </div>
               </div>
             ) : (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className="bg-white rounded-3xl shadow-lg border border-peach-base p-12 text-center"
@@ -271,11 +411,17 @@ export default function Booking() {
                 <div className="w-20 h-20 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Check size={40} />
                 </div>
-                <h2 className="text-3xl font-serif text-charcoal mb-4">You're All Set!</h2>
-                <p className="text-gray-600 font-sans mb-8">
-                  We've received your booking request for {selections.service}. A confirmation email has been sent to you.
+                <h2 className="text-3xl font-serif text-charcoal mb-3">Reservasi Berhasil!</h2>
+                <p className="text-gray-600 font-sans mb-2">
+                  Terima kasih, <strong>{selections.name}</strong>! Pesanan untuk <strong>{selections.service}</strong> pada <strong>{selections.date}</strong> pukul <strong>{selections.time}</strong> telah kami terima.
                 </p>
-                <Button onClick={() => window.location.href = '/'}>Return Home</Button>
+                <p className="text-gray-500 font-sans text-sm mb-8">
+                  Kami akan menghubungi Anda via WhatsApp di <strong>{selections.phone}</strong> untuk konfirmasi.
+                </p>
+                <div className="flex gap-3 justify-center">
+                  <Button variant="outline" onClick={() => window.location.href = "/my-bookings"}>Lihat Booking Saya</Button>
+                  <Button onClick={() => window.location.href = "/"}>Kembali ke Beranda</Button>
+                </div>
               </motion.div>
             )}
           </Reveal>
