@@ -10,25 +10,33 @@ import { ChevronDown } from "lucide-react";
 
 const services = [
   {
-    category: "Hair Styling",
+    category: "Hair Services",
     items: [
-      { id: "h1", name: "Signature Blowout", price: "$65+", description: "A luxurious wash, relaxing scalp massage, and our signature voluminous blowout that lasts for days." },
-      { id: "h2", name: "Balayage & Color", price: "$180+", description: "Custom hand-painted highlights tailored to enhance your natural beauty with a seamless grow-out." },
-      { id: "h3", name: "Precision Cut", price: "$90+", description: "A bespoke haircut designed for your face shape, lifestyle, and hair texture." },
+      { id: "h1", name: "Potong + Cuci + Blow + Tonic + Vit", price: "40K", description: "Complete haircut package for a refreshed look." },
+      { id: "h2", name: "Cuci + Blow + Tonic + Vit", price: "30K", description: "Refreshing wash and professional blowout." },
+      { id: "h3", name: "Cuci + Catok + Tonic + Vit", price: "40K-50K", description: "Wash and flat iron styling for sleek straight hair." },
+      { id: "h4", name: "Creambath + Blow + Tonic + Vit", price: "60K", description: "Deep conditioning creambath treatment." },
+      { id: "h5", name: "Hair Mask + Blow + Tonic + Vit", price: "70K", description: "Intensive hair mask for damaged or dry hair." },
+      { id: "h6", name: "Hair Spa + Blow + Tonic + Vit", price: "85K", description: "Luxurious spa treatment for ultimate hair rejuvenation." },
     ]
   },
   {
-    category: "Skin Care",
+    category: "Keratin Treat",
     items: [
-      { id: "s1", name: "Gold Radiance Facial", price: "$150", description: "Our 24k gold infused facial stimulates collagen and leaves your skin glowing with a youthful radiance." },
-      { id: "s2", name: "Deep Cleansing", price: "$120", description: "A thorough extraction and purification process to reset and clarify congested skin." },
+      { id: "k1", name: "Hair Mask Keratin + Blow + Tonic + Vit", price: "80K", description: "Keratin infused mask for smooth and manageable hair." },
+      { id: "k2", name: "Smoothing Keratin Short", price: "300K-400K", description: "Keratin smoothing treatment for short hair." },
+      { id: "k3", name: "Smoothing Keratin Medium", price: "400K-500K", description: "Keratin smoothing treatment for medium length hair." },
+      { id: "k4", name: "Smoothing Keratin Long", price: "500K-600K", description: "Keratin smoothing treatment for long hair." },
+      { id: "k5", name: "Filler Keratin", price: "350K-650K", description: "Keratin filler to restore hair strength and structure." },
     ]
   },
   {
-    category: "Nail Studio",
+    category: "Colouring",
     items: [
-      { id: "n1", name: "Luxe Spa Manicure", price: "$55", description: "Includes shaping, cuticle care, exfoliation, a hydrating massage, and premium polish application." },
-      { id: "n2", name: "Gel Extensions", price: "$85", description: "Durable, natural-looking extensions meticulously sculpted for flawless length and shape." },
+      { id: "c1", name: "Bleaching all Hair", price: "150K-300K", description: "Full hair bleaching process." },
+      { id: "c2", name: "Colouring all Hair", price: "120K-300K", description: "Full hair coloring with premium dye." },
+      { id: "c3", name: "Peakaboo or Highlight", price: "220K-450K", description: "Stylish peekaboo or highlight coloring techniques." },
+      { id: "c4", name: "Ombre", price: "250K-500K", description: "Beautiful gradient ombre coloring." },
     ]
   }
 ];

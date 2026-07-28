@@ -88,8 +88,14 @@ export default function Booking() {
     switch (currentStep) {
       case 0:
         return (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {["Signature Blowout", "Balayage & Color", "Gold Radiance Facial", "Luxe Spa Manicure"].map(svc => (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+            {[
+              "Potong + Cuci + Blow + Tonic + Vit", "Cuci + Blow + Tonic + Vit", "Cuci + Catok + Tonic + Vit",
+              "Creambath + Blow + Tonic + Vit", "Hair Mask + Blow + Tonic + Vit", "Hair Spa + Blow + Tonic + Vit",
+              "Hair Mask Keratin + Blow + Tonic + Vit", "Smoothing Keratin Short", "Smoothing Keratin Medium",
+              "Smoothing Keratin Long", "Filler Keratin", "Bleaching all Hair", "Colouring all Hair", 
+              "Peakaboo or Highlight", "Ombre"
+            ].map(svc => (
               <div 
                 key={svc}
                 onClick={() => setSelections({...selections, service: svc})}
