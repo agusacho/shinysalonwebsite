@@ -56,7 +56,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <h3 className="text-xl font-serif text-charcoal mb-1">Our Location</h3>
-                  <p className="text-gray-600 font-sans">123 Luxury Avenue, Golden District<br/>New York, NY 10001</p>
+                  <p className="text-gray-600 font-sans">Jalan Raya Padjajaran No. 54<br/>Gedung Alumni IPB, Bogor</p>
                 </div>
               </div>
             </Reveal>
@@ -80,7 +80,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <h3 className="text-xl font-serif text-charcoal mb-1">Phone & Email</h3>
-                  <p className="text-gray-600 font-sans">hello@shinysalon.com<br/>+1 (555) 123-4567</p>
+                  <p className="text-gray-600 font-sans">hello@shinysalon.com<br/>+62 812-3456-7890</p>
                 </div>
               </div>
             </Reveal>
