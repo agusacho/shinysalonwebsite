@@ -11,8 +11,8 @@ export default async function proxy(request: NextRequest) {
   await updateSession({
     baseUrl: process.env.NEXT_PUBLIC_INSFORGE_URL!,
     anonKey: process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY!,
-    requestCookies: request.cookies,
-    responseCookies: response.cookies
+    requestCookies: request.cookies as any,
+    responseCookies: response.cookies as any
   });
 
   return response;
