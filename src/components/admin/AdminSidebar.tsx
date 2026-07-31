@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Calendar, Scissors,
-  MessageSquare, LogOut, ChevronRight
+  MessageSquare, LogOut, ChevronRight, FileText
 } from "lucide-react";
 import Image from "next/image";
 
@@ -13,6 +13,7 @@ const navItems = [
   { label: "Bookings", href: "/admin/bookings", icon: Calendar },
   { label: "Layanan", href: "/admin/services", icon: Scissors },
   { label: "Pesan Kontak", href: "/admin/contacts", icon: MessageSquare },
+  { label: "Web Content", href: "/admin/content", icon: FileText },
 ];
 
 export function AdminSidebar({ userEmail }: { userEmail: string }) {

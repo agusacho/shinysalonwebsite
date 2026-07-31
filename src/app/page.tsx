@@ -4,13 +4,17 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Hero } from "@/components/sections/Hero";
 import { FloatingBooking } from "@/components/sections/FloatingBooking";
 import { Reveal } from "@/components/animations/Reveal";
+import { getContentBySection } from "@/app/actions/content";
 
-export default function Home() {
+export default async function Home() {
+  const rawContent = await getContentBySection("Hero");
+  const content = rawContent.reduce((acc, curr) => ({ ...acc, [curr.id]: curr.value }), {});
+
   return (
     <main className="min-h-screen bg-background relative">
       <LiquidPreloader />
       <Navbar />
-      <Hero />
+      <Hero content={content} />
       
       <section className="py-24 px-6 bg-peach-base/20 relative z-10">
         <div className="max-w-7xl mx-auto">
