@@ -1,23 +1,23 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import {
   LayoutDashboard, Calendar, Scissors,
   MessageSquare, LogOut, ChevronRight, FileText
 } from "lucide-react";
-import Image from "next/image";
 
 const navItems = [
-  { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
-  { label: "Bookings", href: "/admin/bookings", icon: Calendar },
-  { label: "Layanan", href: "/admin/services", icon: Scissors },
-  { label: "Pesan Kontak", href: "/admin/contacts", icon: MessageSquare },
-  { label: "Web Content", href: "/admin/content", icon: FileText },
+  { label: "Dashboard", tab: "dashboard", icon: LayoutDashboard },
+  { label: "Bookings", tab: "bookings", icon: Calendar },
+  { label: "Layanan", tab: "services", icon: Scissors },
+  { label: "Pesan Kontak", tab: "contacts", icon: MessageSquare },
+  { label: "Web Content", tab: "content", icon: FileText },
 ];
 
 export function AdminSidebar({ userEmail }: { userEmail: string }) {
-  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const currentTab = searchParams.get("tab") || "dashboard";
 
   return (
     <aside className="fixed inset-y-0 left-0 w-64 bg-[#1C1C1E] flex flex-col shadow-2xl z-50">
@@ -36,10 +36,11 @@ export function AdminSidebar({ userEmail }: { userEmail: string }) {
 
       {/* Navigation */}
       <nav className="flex-1 px-3 py-6 space-y-1">
-        {navItems.map(({ label, href, icon: Icon }) => {
-          const isActive = pathname === href || (href !== "/admin" && pathname.startsWith(href));
+        {navItems.map(({ label, tab, icon: Icon }) => {
+          const isActive = currentTab === tab;
+          const href = tab === "dashboard" ? "/admin" : `/admin?tab=${tab}`;
           return (
-            <Link key={href} href={href}
+            <Link key={tab} href={href}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all group ${
                 isActive
                   ? "bg-[#D4AF37] text-[#1C1C1E]"

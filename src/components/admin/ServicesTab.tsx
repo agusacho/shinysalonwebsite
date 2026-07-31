@@ -11,7 +11,7 @@ type Service = {
   is_active: boolean;
 };
 
-export default async function AdminServicesPage() {
+export default async function ServicesTab() {
   const cookieStore = await cookies();
   const insforge = createServerClient({
     baseUrl: process.env.NEXT_PUBLIC_INSFORGE_URL!,

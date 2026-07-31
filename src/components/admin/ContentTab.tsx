@@ -1,7 +1,7 @@
 import { getAllContent } from "@/app/actions/content";
 import ContentEditor from "@/components/admin/ContentEditor";
 
-export default async function ContentAdminPage() {
+export default async function ContentTab() {
   const allContent = await getAllContent();
 
   // Group content by section

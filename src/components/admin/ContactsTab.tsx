@@ -7,7 +7,7 @@ type Contact = {
   message: string; created_at: string;
 };
 
-export default async function AdminContactsPage() {
+export default async function ContactsTab() {
   const cookieStore = await cookies();
   const insforge = createServerClient({
     baseUrl: process.env.NEXT_PUBLIC_INSFORGE_URL!,

@@ -17,14 +17,13 @@ const STATUS_COLORS: Record<string, string> = {
   cancelled: "bg-red-100 text-red-700 border-red-200",
 };
 
-export default async function AdminBookingsPage({
+export default async function BookingsTab({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; q?: string }>;
+  searchParams: { status?: string; q?: string };
 }) {
-  const params = await searchParams;
-  const filterStatus = params.status ?? "all";
-  const query = params.q ?? "";
+  const filterStatus = searchParams.status ?? "all";
+  const query = searchParams.q ?? "";
 
   const cookieStore = await cookies();
   const insforge = createServerClient({
@@ -69,7 +68,7 @@ export default async function AdminBookingsPage({
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex flex-col sm:flex-row gap-4">
         <div className="flex gap-2 flex-wrap">
           {statuses.map((s) => (
-            <a key={s} href={`/admin/bookings?status=${s}${query ? `&q=${query}` : ""}`}
+            <a key={s} href={`/admin?tab=bookings&status=${s}${query ? `&q=${query}` : ""}`}
               className={`px-4 py-2 rounded-full text-sm font-sans font-medium transition-all ${
                 filterStatus === s
                   ? "bg-[#D4AF37] text-white shadow-sm"
@@ -79,7 +78,8 @@ export default async function AdminBookingsPage({
             </a>
           ))}
         </div>
-        <form method="GET" action="/admin/bookings" className="ml-auto flex gap-2">
+        <form method="GET" action="/admin" className="ml-auto flex gap-2">
+          <input type="hidden" name="tab" value="bookings" />
           <input type="hidden" name="status" value={filterStatus} />
           <input name="q" defaultValue={query} placeholder="Cari nama / layanan..."
             className="px-4 py-2 rounded-full border border-gray-200 text-sm font-sans focus:outline-none focus:border-[#D4AF37] w-56" />
