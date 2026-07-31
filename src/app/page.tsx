@@ -7,8 +7,9 @@ import { Reveal } from "@/components/animations/Reveal";
 import { getContentBySection } from "@/app/actions/content";
 
 export default async function Home() {
-  const rawContent = await getContentBySection("Hero");
-  const content = rawContent.reduce((acc, curr) => ({ ...acc, [curr.id]: curr.value }), {});
+  const rawHero = await getContentBySection("Hero");
+  const rawServices = await getContentBySection("Home_Services");
+  const content = [...rawHero, ...rawServices].reduce((acc, curr) => ({ ...acc, [curr.id]: curr.value }), {} as Record<string, string>);
 
   return (
     <main className="min-h-screen bg-background relative">
@@ -20,18 +21,18 @@ export default async function Home() {
         <div className="max-w-7xl mx-auto">
           <Reveal>
             <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-serif text-charcoal font-bold mb-4">Our Signature Services</h2>
+              <h2 className="text-4xl md:text-5xl font-serif text-charcoal font-bold mb-4">{content.home_services_title || "Our Signature Services"}</h2>
               <p className="text-peach-deep font-sans max-w-2xl mx-auto">
-                Discover our curated selection of luxury treatments designed to elevate your natural beauty.
+                {content.home_services_subtitle || "Discover our curated selection of luxury treatments designed to elevate your natural beauty."}
               </p>
             </div>
           </Reveal>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { title: "Hair Services", desc: "Potong, Cuci, Blow, Creambath, Hair Mask & Hair Treatment." },
-              { title: "Keratin Treat", desc: "Perawatan Keratin Smoothing dan Filler untuk rambut sehat berkilau." },
-              { title: "Colouring", desc: "Bleaching, Peakaboo, Highlight, dan Ombre dengan hasil memukau." }
+              { title: content.home_service_1_title || "Hair Services", desc: content.home_service_1_desc || "Potong, Cuci, Blow, Creambath, Hair Mask & Hair Treatment." },
+              { title: content.home_service_2_title || "Keratin Treat", desc: content.home_service_2_desc || "Perawatan Keratin Smoothing dan Filler untuk rambut sehat berkilau." },
+              { title: content.home_service_3_title || "Colouring", desc: content.home_service_3_desc || "Bleaching, Peakaboo, Highlight, dan Ombre dengan hasil memukau." }
             ].map((service, i) => (
               <Reveal key={i} delay={i * 0.2}>
                 <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-lg transition-shadow border border-peach-base group relative overflow-hidden">
