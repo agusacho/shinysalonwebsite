@@ -16,12 +16,14 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 
   if (error || !user) redirect("/login");
 
-  const adminEmails = (process.env.ADMIN_EMAILS ?? "").split(",").map((e) => e.trim().toLowerCase());
+  const adminEmailsRaw = process.env.ADMIN_EMAILS ?? "anisa.ardiansari@gmail.com";
+  const adminEmails = adminEmailsRaw ? adminEmailsRaw.split(",").map((e) => e.trim().toLowerCase()) : [];
   const isAdmin = adminEmails.length > 0
     ? adminEmails.includes((user.email ?? "").toLowerCase())
     : true; // fallback: if no env set, allow any logged-in user
 
   if (!isAdmin) redirect("/");
+
 
   return (
     <div className="min-h-screen bg-[#F9F5F0] flex">
