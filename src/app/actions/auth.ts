@@ -16,8 +16,17 @@ export async function signIn(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   
-  const auth = await getAuthActions();
-  return await auth.signInWithPassword({ email, password });
+  try {
+    const auth = await getAuthActions();
+    const result = await auth.signInWithPassword({ email, password });
+    
+    if (result.error) {
+      return { error: { message: result.error.message } };
+    }
+    return { success: true };
+  } catch (err: any) {
+    return { error: { message: err.message || "Gagal masuk" } };
+  }
 }
 
 export async function register(formData: FormData) {
@@ -25,15 +34,29 @@ export async function register(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   
-  const auth = await getAuthActions();
-  return await auth.signUp({ 
-    email, 
-    password,
-    name 
-  });
+  try {
+    const auth = await getAuthActions();
+    const result = await auth.signUp({ 
+      email, 
+      password,
+      name 
+    });
+    
+    if (result.error) {
+      return { error: { message: result.error.message } };
+    }
+    return { success: true };
+  } catch (err: any) {
+    return { error: { message: err.message || "Gagal mendaftar" } };
+  }
 }
 
 export async function signOut() {
-  const auth = await getAuthActions();
-  return await auth.signOut();
+  try {
+    const auth = await getAuthActions();
+    await auth.signOut();
+    return { success: true };
+  } catch (err: any) {
+    return { error: { message: err.message || "Gagal keluar" } };
+  }
 }
