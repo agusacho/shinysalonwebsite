@@ -39,7 +39,7 @@ export const Hero = () => {
           transition={{ duration: 1, delay: 0.5 }}
           className="text-peach-deep font-accent italic text-xl md:text-2xl mb-4"
         >
-          Welcome to Shiny Salon & Spa
+          Welcome to Shiny Salon
         </motion.p>
         
         <h1 className="text-5xl md:text-7xl font-serif text-charcoal font-bold leading-tight mb-8 min-h-[1.2em]">

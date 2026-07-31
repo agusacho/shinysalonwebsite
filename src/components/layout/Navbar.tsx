@@ -49,7 +49,7 @@ export const Navbar = () => {
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between w-full">
         <Link href="/" className="flex items-center gap-3 font-serif text-2xl tracking-widest text-gold-gradient font-bold">
           <Image src="/logo.png" alt="Shiny Salon Logo" width={48} height={48} className="object-contain drop-shadow-md" />
-          SHINY SALON & SPA
+          SHINY SALON
         </Link>
 
         {/* Desktop Nav */}
