@@ -25,7 +25,7 @@ export default function Home() {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { title: "Hair Services", desc: "Potong, Cuci, Blow, Creambath, Hair Mask & Hair Spa." },
+              { title: "Hair Services", desc: "Potong, Cuci, Blow, Creambath, Hair Mask & Hair Treatment." },
               { title: "Keratin Treat", desc: "Perawatan Keratin Smoothing dan Filler untuk rambut sehat berkilau." },
               { title: "Colouring", desc: "Bleaching, Peakaboo, Highlight, dan Ombre dengan hasil memukau." }
             ].map((service, i) => (

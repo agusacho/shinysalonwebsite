@@ -21,7 +21,7 @@ const SERVICES = [
   { name: "Cuci+Catok+Tonic+Vit", price: "40K-50K", category: "Hair Services" },
   { name: "Creambath+Blow+Tonic+Vit", price: "60K", category: "Hair Services" },
   { name: "Hair Mask+Blow+Tonic+Vit", price: "70K", category: "Hair Services" },
-  { name: "Hair Spa+Blow+Tonic+Vit", price: "85K", category: "Hair Services" },
+  { name: "Hair Treatment+Blow+Tonic+Vit", price: "85K", category: "Hair Services" },
   { name: "Hair Mask Keratin+Blow+Tonic+Vit", price: "80K", category: "Keratin Treat" },
   { name: "Smoothing Keratin Short", price: "300K-400K", category: "Keratin Treat" },
   { name: "Smoothing Keratin Medium", price: "400K-500K", category: "Keratin Treat" },

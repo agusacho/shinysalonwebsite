@@ -7,10 +7,10 @@ import { FloatingBooking } from "@/components/sections/FloatingBooking";
 import { Reveal } from "@/components/animations/Reveal";
 
 const timelineEvents = [
-  { year: "2018", title: "The Beginning", description: "Shiny Salon & Spa was founded with a mission to bring premium spa experiences directly to your home." },
+  { year: "2018", title: "The Beginning", description: "Shiny Salon was founded with a mission to bring premium salon experiences directly to your home." },
   { year: "2020", title: "Home Service Pioneer", description: "Focused our services to cater specifically to female students and young women in Bogor." },
   { year: "2023", title: "Luxury Redefined", description: "Expanded our treatment offerings, maintaining the opulent aesthetics our clients love." },
-  { year: "2026", title: "Digital Flagship", description: "Launched our new digital experience, making booking your next home spa session seamless." },
+  { year: "2026", title: "Digital Flagship", description: "Launched our new digital experience, making booking your next home session seamless." },
 ];
 
 const teamMembers = [
@@ -39,7 +39,7 @@ export default function About() {
           <Reveal>
             <h1 className="text-5xl md:text-6xl font-serif text-charcoal font-bold mb-6">Our Story</h1>
             <p className="text-xl text-peach-deep font-sans">
-              Exclusive home service spa designed for female students and young women in Bogor.
+              Exclusive home service designed for female students and young women in Bogor.
             </p>
           </Reveal>
         </div>
