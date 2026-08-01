@@ -435,7 +435,7 @@ export default function Booking() {
                   </div>
                 </div>
 
-                <div className="min-h-[280px]">
+                <div className={currentStep === 2 ? "overflow-y-auto max-h-[65vh]" : "min-h-[280px]"}>
                   <AnimatePresence mode="wait">
                     <motion.div key={currentStep}
                       initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
