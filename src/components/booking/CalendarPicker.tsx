@@ -7,10 +7,10 @@ import { cn } from "@/lib/utils";
 import { getBookedSlots } from "@/app/actions/bookings";
 
 const TIMES = ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00"];
-const DAY_NAMES = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTHS_ID = [
-  "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-  "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 ];
 
 type Props = {
@@ -48,7 +48,6 @@ export function CalendarPicker({ selectedDate, selectedTime, onSelect }: Props) 
         slots2 = await getBookedSlots(key2);
       }
       
-      // Deduplicate slots just in case
       const allSlots = [...slots1, ...slots2];
       const unique = allSlots.filter((v, i, a) => a.findIndex(t => (t.date === v.date && t.time === v.time)) === i);
       setBookedSlots(unique);
@@ -89,80 +88,75 @@ export function CalendarPicker({ selectedDate, selectedTime, onSelect }: Props) 
   const todayStr = today.toISOString().split("T")[0];
   const currentHourMinutes = `${String(today.getHours()).padStart(2, "0")}:${String(today.getMinutes()).padStart(2, "0")}`;
 
-  // Header formatting (e.g., "September 2026" or "Sep - Okt 2026")
   const startMonthStr = MONTHS_ID[viewStart.getMonth()];
   const endMonthStr = MONTHS_ID[endDate.getMonth()];
   const headerTitle = startMonthStr === endMonthStr 
     ? `${startMonthStr} ${viewStart.getFullYear()}`
-    : `${startMonthStr.slice(0, 3)} - ${endMonthStr.slice(0, 3)} ${endDate.getFullYear()}`;
+    : `${startMonthStr} - ${endMonthStr} ${endDate.getFullYear()}`;
 
   const isPastWeek = endDate < getMonday(today);
 
   return (
     <div className="space-y-4">
       {/* Toolbar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-200">
         <div className="flex items-center gap-4">
-          <div className="flex items-center bg-gray-50 rounded-lg p-1 border border-gray-200">
-            <button
-              onClick={prevWeek}
-              disabled={isPastWeek}
-              className="p-1.5 rounded-md hover:bg-white hover:shadow-sm transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-            >
-              <ChevronLeft size={18} className="text-gray-600" />
-            </button>
+          <div className="flex items-center gap-2">
             <button
               onClick={jumpToToday}
-              className="px-3 py-1.5 text-sm font-medium font-sans text-gray-700 hover:bg-white hover:shadow-sm rounded-md transition-all"
+              className="px-4 py-1.5 text-sm font-sans font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-all"
             >
-              Hari Ini
+              Today
             </button>
-            <button
-              onClick={nextWeek}
-              className="p-1.5 rounded-md hover:bg-white hover:shadow-sm transition-all"
-            >
-              <ChevronRight size={18} className="text-gray-600" />
-            </button>
+            <div className="flex items-center">
+              <button
+                onClick={prevWeek}
+                disabled={isPastWeek}
+                className="p-1.5 hover:bg-gray-100 rounded-full transition-all disabled:opacity-30 disabled:cursor-not-allowed text-gray-600"
+              >
+                <ChevronLeft size={20} />
+              </button>
+              <button
+                onClick={nextWeek}
+                className="p-1.5 hover:bg-gray-100 rounded-full transition-all text-gray-600"
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
           </div>
-          <h3 className="text-lg font-serif font-bold text-charcoal flex items-center gap-2">
-            <CalendarDays size={18} className="text-gold-metallic" />
+          <h3 className="text-xl font-sans text-gray-800 flex items-center gap-3">
             {headerTitle}
+            {loading && <Loader2 size={16} className="animate-spin text-gray-400" />}
           </h3>
-          {loading && <Loader2 size={16} className="animate-spin text-gold-metallic" />}
-        </div>
-
-        {/* Legend */}
-        <div className="flex items-center gap-3 text-xs font-sans text-gray-500">
-          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-green-100 border border-green-200" /> Kosong</span>
-          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-red-50 border border-red-100" /> Terpesan</span>
-          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-gold-metallic shadow-sm" /> Dipilih</span>
         </div>
       </div>
 
-      {/* Grid Calendar (Scrollable horizontally) */}
-      <div className="w-full overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm custom-scrollbar">
-        <div className="min-w-[750px]">
+      {/* Grid Calendar (MS Teams Style) */}
+      <div className="w-full overflow-x-auto bg-white border border-gray-200 shadow-sm custom-scrollbar">
+        <div className="min-w-[800px]">
           {/* Header Row: Days */}
-          <div className="grid grid-cols-[70px_1fr_1fr_1fr_1fr_1fr_1fr_1fr] bg-gray-50 border-b border-gray-200">
-            <div className="p-3 border-r border-gray-200 flex flex-col justify-end items-center pb-2">
-              <span className="text-[10px] uppercase font-bold text-gray-400">Jam</span>
-            </div>
+          <div className="grid grid-cols-[80px_1fr_1fr_1fr_1fr_1fr_1fr_1fr] border-b border-gray-200">
+            {/* Empty top-left cell */}
+            <div className="p-3 border-r border-gray-200 bg-white" />
+            
             {weekDays.map((date, i) => {
               const dateStr = date.toISOString().split("T")[0];
               const isToday = dateStr === todayStr;
+              
+              // Formatting like "Feb 22 Mon" if it's the first of the month or today, else "23 Tue"
+              const isFirstOfMonth = date.getDate() === 1;
+              const showMonth = isFirstOfMonth || isToday;
+
               return (
-                <div key={i} className={cn(
-                  "p-3 border-r border-gray-200 last:border-r-0 text-center flex flex-col items-center justify-center",
-                  isToday ? "bg-peach-base/20" : ""
-                )}>
-                  <div className={cn("text-xs font-sans mb-1", isToday ? "text-gold-metallic font-bold" : "text-gray-500")}>
-                    {DAY_NAMES[date.getDay()]}
-                  </div>
+                <div key={i} className="p-3 border-r border-gray-200 last:border-r-0 text-center flex flex-col items-center justify-center bg-white relative">
+                  {isToday && <div className="absolute top-0 left-0 right-0 h-1 bg-gold-metallic" />}
                   <div className={cn(
-                    "w-8 h-8 flex items-center justify-center rounded-full text-lg font-serif font-bold",
-                    isToday ? "bg-gold-metallic text-white shadow-md" : "text-charcoal"
+                    "flex items-baseline gap-1.5 font-sans",
+                    isToday ? "text-gold-metallic" : "text-gray-600"
                   )}>
-                    {date.getDate()}
+                    {showMonth && <span className="text-sm font-medium">{MONTHS_ID[date.getMonth()]}</span>}
+                    <span className={cn("text-2xl", isToday ? "font-bold" : "font-normal")}>{date.getDate()}</span>
+                    <span className="text-sm font-medium">{DAY_NAMES[date.getDay()]}</span>
                   </div>
                 </div>
               );
@@ -170,11 +164,11 @@ export function CalendarPicker({ selectedDate, selectedTime, onSelect }: Props) 
           </div>
 
           {/* Time Rows */}
-          <div className="relative">
+          <div className="relative bg-[#FAFAFA]">
             {TIMES.map((time, rowIdx) => (
-              <div key={time} className="grid grid-cols-[70px_1fr_1fr_1fr_1fr_1fr_1fr_1fr] border-b border-gray-100 last:border-0 group">
-                {/* Time Label */}
-                <div className="p-3 text-xs font-sans font-semibold text-gray-500 border-r border-gray-200 bg-gray-50 flex items-center justify-center">
+              <div key={time} className="grid grid-cols-[80px_1fr_1fr_1fr_1fr_1fr_1fr_1fr] border-b border-gray-200 last:border-0 group">
+                {/* Time Label (Left Column) */}
+                <div className="p-2 text-[11px] font-sans text-gray-500 border-r border-gray-200 bg-white flex items-start justify-end pr-3">
                   {time}
                 </div>
 
@@ -193,31 +187,43 @@ export function CalendarPicker({ selectedDate, selectedTime, onSelect }: Props) 
                     <div 
                       key={`${dateStr}-${time}`} 
                       className={cn(
-                        "p-1.5 border-r border-gray-100 last:border-r-0 h-16 transition-colors",
-                        dateStr === todayStr ? "bg-peach-base/5" : ""
+                        "border-r border-gray-200 last:border-r-0 h-16 transition-colors relative group/cell cursor-pointer",
+                        dateStr === todayStr ? "bg-[#F3F2F1]/30" : "bg-white",
+                        !disabled && !isSelected && "hover:bg-[#F3F2F1]"
                       )}
+                      onClick={() => !disabled && onSelect(dateStr, time)}
                     >
-                      <button
-                        onClick={() => !disabled && onSelect(dateStr, time)}
-                        disabled={disabled}
-                        className={cn(
-                          "w-full h-full rounded-lg flex flex-col items-center justify-center transition-all outline-none font-sans text-xs relative overflow-hidden",
+                      {/* MS Teams Style Event Block */}
+                      {(isBooked || isSelected) && (
+                        <div className={cn(
+                          "absolute top-1 bottom-1 left-1 right-2 rounded-sm border-l-[4px] p-1.5 flex flex-col overflow-hidden text-[11px] font-sans shadow-sm",
                           isSelected 
-                            ? "bg-gold-metallic text-white shadow-md ring-2 ring-gold-metallic ring-offset-1 font-bold"
-                            : disabled
-                              ? isBooked
-                                ? "bg-red-50 border border-red-100 text-red-400 cursor-not-allowed"
-                                : "bg-gray-50 border border-gray-100 text-gray-400 cursor-not-allowed opacity-60"
-                              : "bg-green-50 border border-green-100 text-green-700 hover:bg-green-100 hover:border-green-300 hover:shadow-sm cursor-pointer"
-                        )}
-                      >
-                        {isSelected && (
-                          <motion.div layoutId="selected-indicator" className="absolute inset-0 bg-gold-metallic z-0 rounded-lg" />
-                        )}
-                        <span className="relative z-10">
-                          {isSelected ? "Terpilih" : disabled ? (isBooked ? "Terpesan" : "Berlalu") : "Tersedia"}
-                        </span>
-                      </button>
+                            // Selected: Pink Metallic theme matching MS Teams block layout
+                            ? "bg-[#FCE4EC] border-[#F06292] text-[#880E4F] z-10 ring-1 ring-[#F8BBD0]"
+                            // Booked: Gray muted theme
+                            : "bg-[#F3F2F1] border-[#A19F9D] text-[#605E5C]"
+                        )}>
+                          <div className="font-semibold truncate flex items-center justify-between">
+                            {isSelected ? "Jadwal Anda" : "Terpesan"}
+                            {isSelected && <span className="text-[#F06292]">✓</span>}
+                          </div>
+                          <span className="opacity-80 mt-0.5">{time} - {String(parseInt(time) + 1).padStart(2, '0')}:00</span>
+                        </div>
+                      )}
+                      
+                      {/* Hover block for empty available slots */}
+                      {!disabled && !isSelected && (
+                         <div className="absolute top-1 bottom-1 left-1 right-2 rounded-sm border-l-[4px] border-transparent p-1.5 opacity-0 group-hover/cell:opacity-100 group-hover/cell:bg-[#FCE4EC]/50 transition-all text-[11px] font-sans text-gray-500 flex flex-col">
+                           <span className="font-semibold text-charcoal">Pilih Jadwal</span>
+                         </div>
+                      )}
+                      
+                      {/* Past indicator */}
+                      {isPast && !isBooked && (
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                           <div className="w-full border-t border-gray-200 border-dashed" />
+                        </div>
+                      )}
                     </div>
                   );
                 })}
@@ -227,21 +233,21 @@ export function CalendarPicker({ selectedDate, selectedTime, onSelect }: Props) 
         </div>
       </div>
       
-      {/* Selected Value Indicator */}
+      {/* Selected Value Confirmation */}
       {selectedDate && selectedTime && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mx-auto max-w-lg p-3 bg-peach-base/20 border border-peach-warm/30 rounded-xl flex items-center justify-center gap-2 text-sm font-sans text-charcoal font-medium shadow-sm"
+          className="p-3 bg-peach-base/20 border border-peach-warm/30 rounded-xl flex items-center justify-center gap-2 text-sm font-sans text-charcoal font-medium shadow-sm"
         >
-          <span>✨</span>
+          <span>✅</span>
           <span>
-            Jadwal dipilih: <strong>{new Date(selectedDate + "T12:00:00").toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long" })}</strong> pukul <strong>{selectedTime}</strong>
+            Jadwal reservasi: <strong>{new Date(selectedDate + "T12:00:00").toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</strong> pukul <strong>{selectedTime}</strong>
           </span>
         </motion.div>
       )}
 
-      {/* Add global css for custom scrollbar just for this component */}
+      {/* Global CSS for custom scrollbar */}
       <style dangerouslySetInnerHTML={{__html: `
         .custom-scrollbar::-webkit-scrollbar {
           height: 8px;
