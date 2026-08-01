@@ -70,6 +70,36 @@ export async function updateContent(id: string, value: string) {
   return { success: true };
 }
 
+export async function upsertContent(id: string, section: string, type: string, value: string) {
+  const client = await getClient();
+
+  const { data: authData } = await client.auth.getCurrentUser();
+  const user = authData?.user;
+  if (!user) return { error: "Unauthorized" };
+
+  const adminEmailsRaw = process.env.ADMIN_EMAILS ?? "anisa.ardiansari@gmail.com";
+  const adminEmails = adminEmailsRaw.split(",").map((e) => e.trim().toLowerCase());
+  if (adminEmails.length > 0 && !adminEmails.includes((user.email ?? "").toLowerCase())) {
+    return { error: "Forbidden" };
+  }
+
+  const { error } = await client.database
+    .from("site_content")
+    .upsert({ 
+      id, 
+      section, 
+      type, 
+      value, 
+      updated_at: new Date().toISOString()
+    }, { onConflict: "id" });
+
+  if (error) {
+    return { error: (error as any).message };
+  }
+
+  return { success: true };
+}
+
 // Upload a new image to storage and update content
 export async function uploadImageAndUpdateContent(id: string, formData: FormData) {
   const file = formData.get("file") as File;

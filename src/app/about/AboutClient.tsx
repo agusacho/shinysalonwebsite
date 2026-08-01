@@ -6,22 +6,21 @@ import { Navbar } from "@/components/layout/Navbar";
 import { FloatingBooking } from "@/components/sections/FloatingBooking";
 import { Reveal } from "@/components/animations/Reveal";
 
-const timelineEvents = [
-  { year: "2018", title: "The Beginning", description: "Shiny Salon was founded with a mission to bring premium salon experiences directly to your home." },
-  { year: "2020", title: "Home Service Pioneer", description: "Focused our services to cater specifically to female students and young women in Bogor." },
-  { year: "2023", title: "Luxury Redefined", description: "Expanded our treatment offerings, maintaining the opulent aesthetics our clients love." },
-  { year: "2026", title: "Digital Flagship", description: "Launched our new digital experience, making booking your next home session seamless." },
-];
-
-const teamMembers = [
-  { name: "Elena Rossi", role: "Master Stylist", image: "https://images.unsplash.com/photo-1595959183082-7b570b7e08e2?q=80&w=600&auto=format&fit=crop" },
-  { name: "Marcus Chen", role: "Lead Colorist", image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=600&auto=format&fit=crop" },
-  { name: "Sarah Jenkins", role: "Skincare Specialist", image: "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?q=80&w=600&auto=format&fit=crop" },
-];
-
 type AboutContent = Record<string, string>;
 
 export default function AboutClient({ content }: { content: AboutContent }) {
+  const timelineEvents = content.about_timeline ? JSON.parse(content.about_timeline) : [
+    { year: "2018", title: "The Beginning", description: "Shiny Salon was founded with a mission to bring premium salon experiences directly to your home." },
+    { year: "2020", title: "Home Service Pioneer", description: "Focused our services to cater specifically to female students and young women in Bogor." },
+    { year: "2023", title: "Luxury Redefined", description: "Expanded our treatment offerings, maintaining the opulent aesthetics our clients love." },
+    { year: "2026", title: "Digital Flagship", description: "Launched our new digital experience, making booking your next home session seamless." },
+  ];
+
+  const teamMembers = content.about_team ? JSON.parse(content.about_team) : [
+    { name: "Elena Rossi", role: "Master Stylist", image: "https://images.unsplash.com/photo-1595959183082-7b570b7e08e2?q=80&w=600&auto=format&fit=crop" },
+    { name: "Marcus Chen", role: "Lead Colorist", image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=600&auto=format&fit=crop" },
+    { name: "Sarah Jenkins", role: "Skincare Specialist", image: "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?q=80&w=600&auto=format&fit=crop" },
+  ];
   const containerRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,

@@ -5,7 +5,10 @@ export default async function ContentTab() {
   const allContent = await getAllContent();
 
   // Group content by section
-  const sections: Record<string, any[]> = {};
+  const sections: Record<string, any[]> = {
+    About: [] // Guarantee About tab exists
+  };
+  
   for (const item of allContent) {
     if (!sections[item.section]) {
       sections[item.section] = [];

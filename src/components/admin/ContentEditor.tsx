@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { updateContent, uploadImageAndUpdateContent } from "@/app/actions/content";
 import { Button } from "@/components/ui/Button";
+import AboutContentEditor from "./AboutContentEditor";
 
 type ContentItem = {
   id: string;
@@ -67,63 +68,69 @@ export default function ContentEditor({ initialSections }: { initialSections: Re
         ))}
       </div>
       
-      <div className="flex-1 p-8 bg-white">
-        <h2 className="text-2xl font-serif text-charcoal mb-6">{activeTab} Content</h2>
-        
-        <div className="space-y-8">
-          {sections[activeTab].map(item => (
-            <div key={item.id} className="pb-8 border-b border-gray-100 last:border-0">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {item.id.replace(activeTab.toLowerCase() + "_", "").replace(/_/g, " ").toUpperCase()}
-              </label>
-              
-              {item.type === "text" ? (
-                <div className="flex gap-4 items-start">
-                  {item.value.length > 50 ? (
-                    <textarea 
-                      value={item.value || ""}
-                      onChange={(e) => handleTextChange(item.id, e.target.value)}
-                      className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gold-metallic focus:border-transparent outline-none transition-all min-h-[120px]"
-                    />
-                  ) : (
-                    <input 
-                      type="text"
-                      value={item.value || ""}
-                      onChange={(e) => handleTextChange(item.id, e.target.value)}
-                      className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gold-metallic focus:border-transparent outline-none transition-all"
-                    />
-                  )}
-                  <Button 
-                    onClick={() => saveText(item.id, item.value)}
-                    disabled={loading[item.id]}
-                  >
-                    {loading[item.id] ? "Saving..." : "Save"}
-                  </Button>
+      <div className="flex-1 bg-white">
+        {activeTab === "About" ? (
+          <AboutContentEditor initialContent={sections["About"]} />
+        ) : (
+          <div className="p-8">
+            <h2 className="text-2xl font-serif text-charcoal mb-6">{activeTab} Content</h2>
+            
+            <div className="space-y-8">
+              {sections[activeTab].map(item => (
+                <div key={item.id} className="pb-8 border-b border-gray-100 last:border-0">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {item.id.replace(activeTab.toLowerCase() + "_", "").replace(/_/g, " ").toUpperCase()}
+                  </label>
+                  
+                  {item.type === "text" ? (
+                    <div className="flex gap-4 items-start">
+                      {item.value.length > 50 ? (
+                        <textarea 
+                          value={item.value || ""}
+                          onChange={(e) => handleTextChange(item.id, e.target.value)}
+                          className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gold-metallic focus:border-transparent outline-none transition-all min-h-[120px]"
+                        />
+                      ) : (
+                        <input 
+                          type="text"
+                          value={item.value || ""}
+                          onChange={(e) => handleTextChange(item.id, e.target.value)}
+                          className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gold-metallic focus:border-transparent outline-none transition-all"
+                        />
+                      )}
+                      <Button 
+                        onClick={() => saveText(item.id, item.value)}
+                        disabled={loading[item.id]}
+                      >
+                        {loading[item.id] ? "Saving..." : "Save"}
+                      </Button>
+                    </div>
+                  ) : item.type === "image" ? (
+                    <div className="flex gap-6 items-center">
+                      {item.value && (
+                        <img src={item.value} alt={item.id} className="w-32 h-32 object-cover rounded-lg border border-gray-200" />
+                      )}
+                      <div className="flex-1">
+                        <input 
+                          type="file" 
+                          accept="image/*"
+                          onChange={(e) => {
+                            if (e.target.files && e.target.files[0]) {
+                              uploadImage(item.id, e.target.files[0]);
+                            }
+                          }}
+                          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gold-light file:text-gold-metallic hover:file:bg-gold-metallic hover:file:text-white transition-colors"
+                          disabled={loading[item.id]}
+                        />
+                        {loading[item.id] && <p className="text-sm text-gray-500 mt-2">Uploading...</p>}
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
-              ) : item.type === "image" ? (
-                <div className="flex gap-6 items-center">
-                  {item.value && (
-                    <img src={item.value} alt={item.id} className="w-32 h-32 object-cover rounded-lg border border-gray-200" />
-                  )}
-                  <div className="flex-1">
-                    <input 
-                      type="file" 
-                      accept="image/*"
-                      onChange={(e) => {
-                        if (e.target.files && e.target.files[0]) {
-                          uploadImage(item.id, e.target.files[0]);
-                        }
-                      }}
-                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gold-light file:text-gold-metallic hover:file:bg-gold-metallic hover:file:text-white transition-colors"
-                      disabled={loading[item.id]}
-                    />
-                    {loading[item.id] && <p className="text-sm text-gray-500 mt-2">Uploading...</p>}
-                  </div>
-                </div>
-              ) : null}
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
