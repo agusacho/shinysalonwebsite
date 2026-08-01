@@ -14,6 +14,8 @@ import { cn } from "@/lib/utils";
 import { createBrowserClient } from "@insforge/sdk/ssr";
 import { CalendarPicker } from "@/components/booking/CalendarPicker";
 import { checkSlotAvailable } from "@/app/actions/bookings";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
 const steps = ["Service", "Stylist", "Date & Time", "Your Info", "Lampiran", "Konfirmasi"];
 
@@ -42,10 +44,13 @@ const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "application/pdf
 
 const isImage = (type: string) => type.startsWith("image/");
 
-export default function Booking() {
-  const [currentStep, setCurrentStep] = useState(0);
+function BookingForm() {
+  const searchParams = useSearchParams();
+  const initialService = searchParams.get("service") || "";
+  
+  const [currentStep, setCurrentStep] = useState(initialService ? 1 : 0);
   const [selections, setSelections] = useState({
-    service: "", stylist: "", date: "", time: "",
+    service: initialService, stylist: "", date: "", time: "",
     name: "", email: "", phone: "",
     userId: null as string | null,
   });
@@ -491,5 +496,17 @@ export default function Booking() {
         </div>
       </section>
     </main>
+  );
+}
+
+export default function Booking() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-peach-base/5">
+        <div className="animate-spin text-gold-metallic w-8 h-8 border-4 border-current border-t-transparent rounded-full" />
+      </div>
+    }>
+      <BookingForm />
+    </Suspense>
   );
 }
