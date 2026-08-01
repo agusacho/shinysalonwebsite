@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Clock, CalendarDays, Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
+import { ChevronLeft, ChevronRight, Loader2, CalendarDays } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getBookedSlots } from "@/app/actions/bookings";
 
 const TIMES = ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00"];
-const DAYS = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
+const DAY_NAMES = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
 const MONTHS_ID = [
   "Januari", "Februari", "Maret", "April", "Mei", "Juni",
   "Juli", "Agustus", "September", "Oktober", "November", "Desember"
@@ -19,21 +19,39 @@ type Props = {
   onSelect: (date: string, time: string) => void;
 };
 
+// Helper: Get Monday of the current week for a given date
+function getMonday(d: Date) {
+  const date = new Date(d);
+  const day = date.getDay();
+  const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+  return new Date(date.setDate(diff));
+}
+
 export function CalendarPicker({ selectedDate, selectedTime, onSelect }: Props) {
   const today = new Date();
-  const [viewYear, setViewYear] = useState(today.getFullYear());
-  const [viewMonth, setViewMonth] = useState(today.getMonth()); // 0-indexed
+  // Set initial view to the Monday of the current week
+  const [viewStart, setViewStart] = useState<Date>(() => getMonday(today));
   const [bookedSlots, setBookedSlots] = useState<{ date: string; time: string }[]>([]);
   const [loading, setLoading] = useState(false);
-  const [focusDate, setFocusDate] = useState<string | null>(selectedDate || null);
 
-  const monthKey = `${viewYear}-${String(viewMonth + 1).padStart(2, "0")}`;
+  const startMonthKey = `${viewStart.getFullYear()}-${String(viewStart.getMonth() + 1).padStart(2, "0")}`;
+  const endDate = new Date(viewStart);
+  endDate.setDate(endDate.getDate() + 6);
+  const endMonthKey = `${endDate.getFullYear()}-${String(endDate.getMonth() + 1).padStart(2, "0")}`;
 
-  const fetchSlots = useCallback(async (key: string) => {
+  const fetchSlots = useCallback(async (key1: string, key2: string) => {
     setLoading(true);
     try {
-      const slots = await getBookedSlots(key);
-      setBookedSlots(slots);
+      const slots1 = await getBookedSlots(key1);
+      let slots2: any[] = [];
+      if (key1 !== key2) {
+        slots2 = await getBookedSlots(key2);
+      }
+      
+      // Deduplicate slots just in case
+      const allSlots = [...slots1, ...slots2];
+      const unique = allSlots.filter((v, i, a) => a.findIndex(t => (t.date === v.date && t.time === v.time)) === i);
+      setBookedSlots(unique);
     } catch (e) {
       console.error(e);
     } finally {
@@ -42,236 +60,204 @@ export function CalendarPicker({ selectedDate, selectedTime, onSelect }: Props) 
   }, []);
 
   useEffect(() => {
-    fetchSlots(monthKey);
-  }, [monthKey, fetchSlots]);
+    fetchSlots(startMonthKey, endMonthKey);
+  }, [startMonthKey, endMonthKey, fetchSlots]);
 
-  const prevMonth = () => {
-    if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1); }
-    else setViewMonth(m => m - 1);
-    setFocusDate(null);
+  const prevWeek = () => {
+    const newDate = new Date(viewStart);
+    newDate.setDate(newDate.getDate() - 7);
+    setViewStart(newDate);
   };
 
-  const nextMonth = () => {
-    if (viewMonth === 11) { setViewMonth(0); setViewYear(y => y + 1); }
-    else setViewMonth(m => m + 1);
-    setFocusDate(null);
+  const nextWeek = () => {
+    const newDate = new Date(viewStart);
+    newDate.setDate(newDate.getDate() + 7);
+    setViewStart(newDate);
   };
 
-  // Build calendar grid
-  const firstDay = new Date(viewYear, viewMonth, 1).getDay();
-  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+  const jumpToToday = () => {
+    setViewStart(getMonday(new Date()));
+  };
+
+  // Generate the 7 days of the currently viewed week
+  const weekDays = Array.from({ length: 7 }).map((_, i) => {
+    const d = new Date(viewStart);
+    d.setDate(d.getDate() + i);
+    return d;
+  });
+
   const todayStr = today.toISOString().split("T")[0];
+  const currentHourMinutes = `${String(today.getHours()).padStart(2, "0")}:${String(today.getMinutes()).padStart(2, "0")}`;
 
-  const getDateStr = (day: number) =>
-    `${viewYear}-${String(viewMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+  // Header formatting (e.g., "September 2026" or "Sep - Okt 2026")
+  const startMonthStr = MONTHS_ID[viewStart.getMonth()];
+  const endMonthStr = MONTHS_ID[endDate.getMonth()];
+  const headerTitle = startMonthStr === endMonthStr 
+    ? `${startMonthStr} ${viewStart.getFullYear()}`
+    : `${startMonthStr.slice(0, 3)} - ${endMonthStr.slice(0, 3)} ${endDate.getFullYear()}`;
 
-  const getBookedTimesForDate = (dateStr: string) =>
-    bookedSlots.filter(s => s.date === dateStr).map(s => s.time);
-
-  const isFullyBooked = (dateStr: string) => {
-    const booked = getBookedTimesForDate(dateStr);
-    return booked.length >= TIMES.length;
-  };
-
-  const isPast = (dateStr: string) => dateStr < todayStr;
-
-  const isToday = (dateStr: string) => dateStr === todayStr;
-
-  const calendarCells: (number | null)[] = [
-    ...Array(firstDay).fill(null),
-    ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
-  ];
-  // Pad to complete last row
-  while (calendarCells.length % 7 !== 0) calendarCells.push(null);
-
-  const handleDayClick = (day: number) => {
-    const dateStr = getDateStr(day);
-    if (isPast(dateStr) && dateStr !== todayStr) return;
-    if (isFullyBooked(dateStr)) return;
-    setFocusDate(dateStr);
-    // reset time
-    onSelect(dateStr, "");
-  };
-
-  const handleTimeClick = (time: string) => {
-    if (!focusDate) return;
-    const booked = getBookedTimesForDate(focusDate);
-    if (booked.includes(time)) return;
-    onSelect(focusDate, time);
-  };
+  const isPastWeek = endDate < getMonday(today);
 
   return (
-    <div className="space-y-5">
-      {/* Calendar Card */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-          <button
-            onClick={prevMonth}
-            disabled={viewYear === today.getFullYear() && viewMonth <= today.getMonth()}
-            className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-          >
-            <ChevronLeft size={18} className="text-gray-600" />
-          </button>
-
-          <div className="flex items-center gap-2">
-            {loading && <Loader2 size={14} className="animate-spin text-gold-metallic" />}
-            <h3 className="text-base font-serif font-semibold text-charcoal">
-              {MONTHS_ID[viewMonth]} {viewYear}
-            </h3>
+    <div className="space-y-4">
+      {/* Toolbar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center bg-gray-50 rounded-lg p-1 border border-gray-200">
+            <button
+              onClick={prevWeek}
+              disabled={isPastWeek}
+              className="p-1.5 rounded-md hover:bg-white hover:shadow-sm transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              <ChevronLeft size={18} className="text-gray-600" />
+            </button>
+            <button
+              onClick={jumpToToday}
+              className="px-3 py-1.5 text-sm font-medium font-sans text-gray-700 hover:bg-white hover:shadow-sm rounded-md transition-all"
+            >
+              Hari Ini
+            </button>
+            <button
+              onClick={nextWeek}
+              className="p-1.5 rounded-md hover:bg-white hover:shadow-sm transition-all"
+            >
+              <ChevronRight size={18} className="text-gray-600" />
+            </button>
           </div>
-
-          <button onClick={nextMonth} className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
-            <ChevronRight size={18} className="text-gray-600" />
-          </button>
-        </div>
-
-        {/* Day labels */}
-        <div className="grid grid-cols-7 bg-gray-50 border-b border-gray-100">
-          {DAYS.map(d => (
-            <div key={d} className="text-center py-2 text-xs font-bold text-gray-400 font-sans">{d}</div>
-          ))}
-        </div>
-
-        {/* Date grid */}
-        <div className="grid grid-cols-7 p-3 gap-1">
-          {calendarCells.map((day, idx) => {
-            if (!day) return <div key={`empty-${idx}`} />;
-            const dateStr = getDateStr(day);
-            const past = isPast(dateStr) && !isToday(dateStr);
-            const full = isFullyBooked(dateStr);
-            const bookedCount = getBookedTimesForDate(dateStr).length;
-            const isSelected = focusDate === dateStr;
-            const hasBooking = bookedCount > 0;
-
-            return (
-              <motion.button
-                key={dateStr}
-                whileHover={!past && !full ? { scale: 1.08 } : {}}
-                whileTap={!past && !full ? { scale: 0.95 } : {}}
-                onClick={() => !past && handleDayClick(day)}
-                className={cn(
-                  "relative aspect-square flex flex-col items-center justify-center rounded-xl text-sm font-sans transition-all",
-                  past ? "opacity-30 cursor-not-allowed text-gray-400" :
-                  full ? "bg-red-50 text-red-400 cursor-not-allowed border border-red-100" :
-                  isSelected ? "bg-[#D4AF37] text-white shadow-md font-bold" :
-                  isToday(dateStr) ? "border-2 border-[#D4AF37] text-[#D4AF37] font-bold hover:bg-[#D4AF37]/10" :
-                  "hover:bg-peach-base/30 text-charcoal cursor-pointer"
-                )}
-              >
-                <span>{day}</span>
-                {/* Dot indicators */}
-                {!past && !full && hasBooking && !isSelected && (
-                  <div className="flex gap-0.5 mt-0.5">
-                    {Array.from({ length: Math.min(bookedCount, 3) }).map((_, i) => (
-                      <div key={i} className="w-1 h-1 rounded-full bg-amber-400" />
-                    ))}
-                  </div>
-                )}
-                {full && !past && (
-                  <span className="text-[9px] leading-tight text-red-400 font-medium">Penuh</span>
-                )}
-              </motion.button>
-            );
-          })}
+          <h3 className="text-lg font-serif font-bold text-charcoal flex items-center gap-2">
+            <CalendarDays size={18} className="text-gold-metallic" />
+            {headerTitle}
+          </h3>
+          {loading && <Loader2 size={16} className="animate-spin text-gold-metallic" />}
         </div>
 
         {/* Legend */}
-        <div className="px-5 pb-4 flex items-center gap-5 text-xs text-gray-500 font-sans">
-          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-[#D4AF37]" /> Dipilih</span>
-          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-amber-300" /> Ada booking</span>
-          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-red-200" /> Penuh</span>
+        <div className="flex items-center gap-3 text-xs font-sans text-gray-500">
+          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-green-100 border border-green-200" /> Kosong</span>
+          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-red-50 border border-red-100" /> Terpesan</span>
+          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-gold-metallic shadow-sm" /> Dipilih</span>
         </div>
       </div>
 
-      {/* Time Slots */}
-      <AnimatePresence mode="wait">
-        {focusDate && (
-          <motion.div
-            key={focusDate}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.25 }}
-            className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
-          >
-            <div className="flex items-center gap-2 px-5 py-4 border-b border-gray-100">
-              <CalendarDays size={16} className="text-[#D4AF37]" />
-              <h4 className="font-sans font-semibold text-charcoal text-sm">
-                Pilih Jam — {new Date(focusDate + "T12:00:00").toLocaleDateString("id-ID", {
-                  weekday: "long", day: "numeric", month: "long", year: "numeric"
+      {/* Grid Calendar (Scrollable horizontally) */}
+      <div className="w-full overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm custom-scrollbar">
+        <div className="min-w-[750px]">
+          {/* Header Row: Days */}
+          <div className="grid grid-cols-[70px_1fr_1fr_1fr_1fr_1fr_1fr_1fr] bg-gray-50 border-b border-gray-200">
+            <div className="p-3 border-r border-gray-200 flex flex-col justify-end items-center pb-2">
+              <span className="text-[10px] uppercase font-bold text-gray-400">Jam</span>
+            </div>
+            {weekDays.map((date, i) => {
+              const dateStr = date.toISOString().split("T")[0];
+              const isToday = dateStr === todayStr;
+              return (
+                <div key={i} className={cn(
+                  "p-3 border-r border-gray-200 last:border-r-0 text-center flex flex-col items-center justify-center",
+                  isToday ? "bg-peach-base/20" : ""
+                )}>
+                  <div className={cn("text-xs font-sans mb-1", isToday ? "text-gold-metallic font-bold" : "text-gray-500")}>
+                    {DAY_NAMES[date.getDay()]}
+                  </div>
+                  <div className={cn(
+                    "w-8 h-8 flex items-center justify-center rounded-full text-lg font-serif font-bold",
+                    isToday ? "bg-gold-metallic text-white shadow-md" : "text-charcoal"
+                  )}>
+                    {date.getDate()}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Time Rows */}
+          <div className="relative">
+            {TIMES.map((time, rowIdx) => (
+              <div key={time} className="grid grid-cols-[70px_1fr_1fr_1fr_1fr_1fr_1fr_1fr] border-b border-gray-100 last:border-0 group">
+                {/* Time Label */}
+                <div className="p-3 text-xs font-sans font-semibold text-gray-500 border-r border-gray-200 bg-gray-50 flex items-center justify-center">
+                  {time}
+                </div>
+
+                {/* Day Cells */}
+                {weekDays.map((date, colIdx) => {
+                  const dateStr = date.toISOString().split("T")[0];
+                  
+                  // Check Status
+                  const isBooked = bookedSlots.some(s => s.date === dateStr && s.time === time);
+                  const isPast = dateStr < todayStr || (dateStr === todayStr && time <= currentHourMinutes);
+                  const isSelected = selectedDate === dateStr && selectedTime === time;
+                  
+                  const disabled = isBooked || isPast;
+
+                  return (
+                    <div 
+                      key={`${dateStr}-${time}`} 
+                      className={cn(
+                        "p-1.5 border-r border-gray-100 last:border-r-0 h-16 transition-colors",
+                        dateStr === todayStr ? "bg-peach-base/5" : ""
+                      )}
+                    >
+                      <button
+                        onClick={() => !disabled && onSelect(dateStr, time)}
+                        disabled={disabled}
+                        className={cn(
+                          "w-full h-full rounded-lg flex flex-col items-center justify-center transition-all outline-none font-sans text-xs relative overflow-hidden",
+                          isSelected 
+                            ? "bg-gold-metallic text-white shadow-md ring-2 ring-gold-metallic ring-offset-1 font-bold"
+                            : disabled
+                              ? isBooked
+                                ? "bg-red-50 border border-red-100 text-red-400 cursor-not-allowed"
+                                : "bg-gray-50 border border-gray-100 text-gray-400 cursor-not-allowed opacity-60"
+                              : "bg-green-50 border border-green-100 text-green-700 hover:bg-green-100 hover:border-green-300 hover:shadow-sm cursor-pointer"
+                        )}
+                      >
+                        {isSelected && (
+                          <motion.div layoutId="selected-indicator" className="absolute inset-0 bg-gold-metallic z-0 rounded-lg" />
+                        )}
+                        <span className="relative z-10">
+                          {isSelected ? "Terpilih" : disabled ? (isBooked ? "Terpesan" : "Berlalu") : "Tersedia"}
+                        </span>
+                      </button>
+                    </div>
+                  );
                 })}
-              </h4>
-            </div>
-
-            <div className="p-4 grid grid-cols-4 gap-2">
-              {TIMES.map(time => {
-                const booked = getBookedTimesForDate(focusDate);
-                const isBooked = booked.includes(time);
-                const isPastTime = focusDate === todayStr && time <= `${String(today.getHours()).padStart(2, "0")}:${String(today.getMinutes()).padStart(2, "0")}`;
-                const isSelected = selectedDate === focusDate && selectedTime === time;
-                const disabled = isBooked || isPastTime;
-
-                return (
-                  <motion.button
-                    key={time}
-                    whileHover={!disabled ? { scale: 1.04 } : {}}
-                    whileTap={!disabled ? { scale: 0.96 } : {}}
-                    onClick={() => !disabled && handleTimeClick(time)}
-                    className={cn(
-                      "relative flex flex-col items-center justify-center py-3 px-2 rounded-xl border text-sm font-sans transition-all",
-                      disabled
-                        ? isBooked
-                          ? "bg-red-50 border-red-200 cursor-not-allowed"
-                          : "bg-gray-50 border-gray-100 cursor-not-allowed opacity-40"
-                        : isSelected
-                          ? "bg-[#D4AF37] border-[#D4AF37] text-white shadow-md font-bold"
-                          : "bg-green-50 border-green-200 hover:bg-green-100 text-green-800 cursor-pointer"
-                    )}
-                  >
-                    <Clock size={13} className={cn(
-                      "mb-1",
-                      disabled ? isBooked ? "text-red-400" : "text-gray-300" :
-                      isSelected ? "text-white" : "text-green-600"
-                    )} />
-                    <span className={cn(
-                      "font-bold",
-                      disabled ? isBooked ? "text-red-500" : "text-gray-400" :
-                      isSelected ? "text-white" : "text-green-700"
-                    )}>{time}</span>
-                    {isBooked && (
-                      <span className="text-[9px] text-red-400 mt-0.5 leading-tight">Terpesan</span>
-                    )}
-                    {!disabled && !isSelected && (
-                      <span className="text-[9px] text-green-500 mt-0.5 leading-tight">Tersedia</span>
-                    )}
-                    {isSelected && (
-                      <span className="text-[9px] text-white/80 mt-0.5 leading-tight">✓ Dipilih</span>
-                    )}
-                  </motion.button>
-                );
-              })}
-            </div>
-
-            {selectedTime && selectedDate === focusDate && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="mx-4 mb-4 p-3 bg-[#D4AF37]/10 border border-[#D4AF37]/30 rounded-xl flex items-center gap-2 text-sm font-sans text-[#a87c1f]"
-              >
-                <span>✅</span>
-                <span>Jadwal dipilih: <strong>{new Date(focusDate + "T12:00:00").toLocaleDateString("id-ID", { weekday: "short", day: "numeric", month: "short" })}</strong> pukul <strong>{selectedTime}</strong></span>
-              </motion.div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {!focusDate && (
-        <p className="text-center text-sm text-gray-400 font-sans py-2">
-          👆 Pilih tanggal pada kalender di atas untuk melihat slot waktu
-        </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      
+      {/* Selected Value Indicator */}
+      {selectedDate && selectedTime && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mx-auto max-w-lg p-3 bg-peach-base/20 border border-peach-warm/30 rounded-xl flex items-center justify-center gap-2 text-sm font-sans text-charcoal font-medium shadow-sm"
+        >
+          <span>✨</span>
+          <span>
+            Jadwal dipilih: <strong>{new Date(selectedDate + "T12:00:00").toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long" })}</strong> pukul <strong>{selectedTime}</strong>
+          </span>
+        </motion.div>
       )}
+
+      {/* Add global css for custom scrollbar just for this component */}
+      <style dangerouslySetInnerHTML={{__html: `
+        .custom-scrollbar::-webkit-scrollbar {
+          height: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: #f1f5f9;
+          border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #cbd5e1;
+          border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #94a3b8;
+        }
+      `}} />
     </div>
   );
 }
