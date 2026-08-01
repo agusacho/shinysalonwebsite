@@ -63,7 +63,10 @@ export function DropdownDateTimePicker({ selectedDate, selectedTime, onSelect }:
     }
   }, []);
 
+  const [isMounted, setIsMounted] = useState(false);
+
   useEffect(() => {
+    setIsMounted(true);
     fetchSlots();
   }, [fetchSlots]);
 
@@ -74,6 +77,21 @@ export function DropdownDateTimePicker({ selectedDate, selectedTime, onSelect }:
   const handleTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     onSelect(selectedDate, e.target.value);
   };
+
+  if (!isMounted) {
+    return (
+      <div className="space-y-6 animate-pulse">
+        <div>
+          <div className="h-4 w-32 bg-gray-200 rounded mb-2"></div>
+          <div className="h-12 w-full bg-gray-100 rounded-xl"></div>
+        </div>
+        <div>
+          <div className="h-4 w-32 bg-gray-200 rounded mb-2"></div>
+          <div className="h-12 w-full bg-gray-100 rounded-xl"></div>
+        </div>
+      </div>
+    );
+  }
 
   const todayStr = new Date().toISOString().split("T")[0];
   const nowMinutes = new Date().getHours() * 60 + new Date().getMinutes();

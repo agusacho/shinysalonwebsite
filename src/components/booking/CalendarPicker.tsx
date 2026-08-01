@@ -112,6 +112,20 @@ export function CalendarPicker({ selectedDate, selectedTime, onSelect, readOnly 
     }
   };
 
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return (
+      <div className="space-y-4 animate-pulse">
+        <div className="h-14 bg-gray-100 rounded-xl w-full"></div>
+        <div className="h-96 bg-gray-100 rounded-xl w-full"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       {/* ── Toolbar ── */}
