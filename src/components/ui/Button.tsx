@@ -18,7 +18,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       secondary: "bg-peach-base text-charcoal rounded-full hover:bg-peach-warm",
       outline: "border-2 border-gray-300 text-gray-500 rounded-full hover:border-gold-metallic hover:text-gold-metallic hover:bg-gold-metallic/5 transition-all",
       gold: "bg-[#D4AF37] text-white rounded-full hover:bg-[#B38728] hover:shadow-lg transition-colors",
-      "pink-metallic": "bg-gradient-to-r from-[#F8BBD0] via-[#F48FB1] to-[#F06292] text-white rounded-full hover:shadow-lg hover:opacity-90 transition-all font-medium",
+      "pink-metallic": "bg-gradient-to-r from-[#F8BBD0] via-[#F48FB1] to-[#F06292] text-black rounded-full hover:shadow-lg hover:opacity-90 transition-all font-bold",
     };
     
     const sizes = {
