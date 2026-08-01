@@ -33,9 +33,10 @@ function BookingForm({ content }: { content: Record<string, string> }) {
   const initialDate = searchParams.get("date") || "";
   const initialTime = searchParams.get("time") || "";
 
-  // If date+time provided (from Calendar page), skip to Your Info step (step 3)
-  // If only service provided, skip to Stylist (step 1)
-  const initialStep = initialDate && initialTime ? 3 : initialService ? 1 : 0;
+  let initialStep = 0;
+  if (initialService) {
+    initialStep = initialDate && initialTime ? 3 : 1;
+  }
 
   const [dbServices, setDbServices] = useState<any[]>([]);
   const [currentStep, setCurrentStep] = useState(initialStep);
