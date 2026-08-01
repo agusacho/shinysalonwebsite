@@ -8,10 +8,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import {
   Check, ChevronRight, ChevronLeft, AlertCircle,
-  User, Mail, Phone, Upload, X, ImageIcon, FileText
+  User, Mail, Phone, Upload, X, FileText
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createBrowserClient } from "@insforge/sdk/ssr";
+import { CalendarPicker } from "@/components/booking/CalendarPicker";
+import { checkSlotAvailable } from "@/app/actions/bookings";
 
 const steps = ["Service", "Stylist", "Date & Time", "Your Info", "Lampiran", "Konfirmasi"];
 
@@ -126,6 +128,15 @@ export default function Booking() {
       setIsSubmitting(true);
       setSubmitError("");
       try {
+        // 0. Double-booking check (race condition protection)
+        const slotFree = await checkSlotAvailable(selections.date, selections.time);
+        if (!slotFree) {
+          setSubmitError(`Maaf! Slot ${selections.time} pada ${selections.date} baru saja dipesan oleh orang lain. Silakan pilih waktu lain.`);
+          setCurrentStep(2); // bring user back to calendar
+          setIsSubmitting(false);
+          return;
+        }
+
         const client = createBrowserClient({
           baseUrl: process.env.NEXT_PUBLIC_INSFORGE_URL!,
           anonKey: process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY!,
@@ -245,28 +256,11 @@ export default function Booking() {
 
       case 2:
         return (
-          <div className="space-y-5">
-            <div>
-              <label className="block text-sm font-medium text-charcoal mb-2">Pilih Tanggal</label>
-              <input type="date" min={today}
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:border-gold-metallic font-sans"
-                onChange={e => setSelections({ ...selections, date: e.target.value, time: "" })}
-                value={selections.date} />
-            </div>
-            {selections.date && (
-              <div>
-                <label className="block text-sm font-medium text-charcoal mb-3">Pilih Jam</label>
-                <div className="grid grid-cols-4 gap-2">
-                  {TIMES.map(time => (
-                    <div key={time} onClick={() => setSelections({ ...selections, time })}
-                      className={cn("p-3 border rounded-lg text-center text-sm font-sans cursor-pointer hover:border-gold-metallic transition-all",
-                        selections.time === time ? "border-gold-metallic bg-gold-metallic/5 font-bold text-gold-metallic" : "border-gray-200"
-                      )}>{time}</div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+          <CalendarPicker
+            selectedDate={selections.date}
+            selectedTime={selections.time}
+            onSelect={(date, time) => setSelections({ ...selections, date, time })}
+          />
         );
 
       case 3:
