@@ -185,7 +185,7 @@ export default function ServicesTab() {
                   {svc.description && <p className="text-xs text-gray-500 mt-1">{svc.description}</p>}
                 </td>
                 <td className="p-4 text-sm text-gray-600">{svc.duration_minutes} mins</td>
-                <td className="p-4 text-sm text-gray-600">{svc.price.toLocaleString("id-ID")}</td>
+                <td className="p-4 text-sm text-gray-600">{Number(String(svc.price || "0").replace(/\D/g, "")).toLocaleString("id-ID")}</td>
                 <td className="p-4 text-right space-x-2">
                   <button onClick={() => handleEdit(svc)} className="text-gold-metallic hover:underline text-sm font-medium px-2 py-1">Edit</button>
                   <button onClick={() => handleDelete(svc.id)} className="text-red-500 hover:underline text-sm font-medium px-2 py-1">Delete</button>

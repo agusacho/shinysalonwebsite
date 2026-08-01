@@ -231,7 +231,7 @@ function BookingForm({ content }: { content: Record<string, string> }) {
                       <h4 className="font-sans font-medium text-charcoal text-sm">{svc.name}</h4>
                       <span className={cn("font-bold font-sans text-sm ml-4 shrink-0",
                         selections.service === svc.name ? "text-gold-metallic" : "text-peach-deep")}>
-                        Rp {Number(svc.price || 0).toLocaleString("id-ID")}
+                        Rp {Number(String(svc.price || "0").replace(/\D/g, "")).toLocaleString("id-ID")}
                       </span>
                     </div>
                   ))}
