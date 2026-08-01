@@ -1,21 +1,52 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CalendarDays, X } from "lucide-react";
 import { DropdownDateTimePicker } from "@/components/booking/DropdownDateTimePicker";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
+import { createBrowserClient } from "@insforge/sdk/ssr";
 
 export const FloatingBooking = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [selectedService, setSelectedService] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
+  const [services, setServices] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  useEffect(() => {
+    if (isOpen && services.length === 0) {
+      const fetchServices = async () => {
+        setLoading(true);
+        try {
+          const client = createBrowserClient({
+            baseUrl: process.env.NEXT_PUBLIC_INSFORGE_URL!,
+            anonKey: process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY!,
+          });
+          const { data } = await client.database.from("services").select("*");
+          if (data) setServices(data);
+        } catch (err) {
+          console.error("Failed to load services", err);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchServices();
+    }
+  }, [isOpen, services.length]);
+
+  const groupedServices = services.reduce<Record<string, any[]>>((acc, svc) => {
+    if (!acc[svc.category]) acc[svc.category] = [];
+    acc[svc.category].push(svc);
+    return acc;
+  }, {});
+
   const handleContinue = () => {
-    if (selectedDate && selectedTime) {
-      router.push(`/booking?date=${selectedDate}&time=${encodeURIComponent(selectedTime)}`);
+    if (selectedService && selectedDate && selectedTime) {
+      router.push(`/booking?service=${encodeURIComponent(selectedService)}&date=${selectedDate}&time=${encodeURIComponent(selectedTime)}`);
       setIsOpen(false);
     }
   };
@@ -56,10 +87,33 @@ export const FloatingBooking = () => {
               </button>
 
               <div className="mb-6">
-                <h3 className="text-2xl font-serif text-charcoal font-bold mb-2">Cek Jadwal</h3>
+                <h3 className="text-2xl font-serif text-charcoal font-bold mb-2">Cek Jadwal & Layanan</h3>
                 <p className="text-sm text-gray-500 font-sans">
-                  Pilih tanggal dan waktu untuk melihat ketersediaan slot sebelum melakukan booking.
+                  Pilih layanan, tanggal, dan waktu untuk melihat ketersediaan slot.
                 </p>
+              </div>
+
+              <div className="mb-6">
+                <label className="block text-sm font-bold text-gray-700 mb-2 font-sans">
+                  Pilih Layanan
+                </label>
+                <select
+                  value={selectedService}
+                  onChange={(e) => setSelectedService(e.target.value)}
+                  className="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-gold-metallic focus:border-gold-metallic block p-3 outline-none"
+                  disabled={loading}
+                >
+                  <option value="">-- Pilih Layanan --</option>
+                  {Object.entries(groupedServices).map(([cat, items]) => (
+                    <optgroup label={cat} key={cat}>
+                      {items.map(svc => (
+                        <option key={svc.id || svc.name} value={svc.name}>
+                          {svc.name} - Rp {svc.price.toLocaleString("id-ID")}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
+                </select>
               </div>
 
               <div className="mb-8">
@@ -76,7 +130,7 @@ export const FloatingBooking = () => {
               <Button
                 variant="pink-metallic"
                 className="w-full"
-                disabled={!selectedDate || !selectedTime}
+                disabled={!selectedService || !selectedDate || !selectedTime}
                 onClick={handleContinue}
               >
                 Lanjutkan Booking
