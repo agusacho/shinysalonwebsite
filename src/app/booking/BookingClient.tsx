@@ -13,6 +13,7 @@ import {
 import { cn } from "@/lib/utils";
 import { createBrowserClient } from "@insforge/sdk/ssr";
 import { CalendarPicker } from "@/components/booking/CalendarPicker";
+import { DropdownDateTimePicker } from "@/components/booking/DropdownDateTimePicker";
 import { checkSlotAvailable } from "@/app/actions/bookings";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
@@ -263,7 +264,7 @@ function BookingForm({ content }: { content: Record<string, string> }) {
 
       case 2:
         return (
-          <CalendarPicker
+          <DropdownDateTimePicker
             selectedDate={selections.date}
             selectedTime={selections.time}
             onSelect={(date, time) => setSelections({ ...selections, date, time })}
