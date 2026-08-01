@@ -457,7 +457,7 @@ export default function Booking() {
                     className={currentStep === 0 ? "opacity-0 pointer-events-none" : ""}>
                     <ChevronLeft size={18} /> Kembali
                   </Button>
-                  <Button variant="gold" onClick={nextStep} disabled={isSubmitting}>
+                  <Button variant="pink-metallic" onClick={nextStep} disabled={isSubmitting}>
                     {isSubmitting ? "Memproses..." : currentStep === steps.length - 1 ? "Konfirmasi Booking" : "Lanjut"}
                     {!isSubmitting && <ChevronRight size={18} />}
                   </Button>
