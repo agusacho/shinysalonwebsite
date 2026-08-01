@@ -6,6 +6,7 @@ import { cookies } from "next/headers";
 export type BookedSlot = {
   date: string;
   time: string;
+  service?: string;
 };
 
 export async function getBookedSlots(month: string): Promise<BookedSlot[]> {
@@ -25,14 +26,14 @@ export async function getBookedSlots(month: string): Promise<BookedSlot[]> {
 
   const { data, error } = await insforge.database
     .from("bookings")
-    .select("date, time, status")
+    .select("date, time, status, service_name")
     .gte("date", startDate)
     .lte("date", endDate)
     .in("status", ["pending", "confirmed"]);
 
   if (error || !data) return [];
 
-  return data.map((b: any) => ({ date: b.date, time: b.time }));
+  return data.map((b: any) => ({ date: b.date, time: b.time, service: b.service_name }));
 }
 
 export async function checkSlotAvailable(date: string, time: string): Promise<boolean> {

@@ -47,10 +47,17 @@ const isImage = (type: string) => type.startsWith("image/");
 function BookingForm() {
   const searchParams = useSearchParams();
   const initialService = searchParams.get("service") || "";
-  
-  const [currentStep, setCurrentStep] = useState(initialService ? 1 : 0);
+  const initialDate = searchParams.get("date") || "";
+  const initialTime = searchParams.get("time") || "";
+
+  // If date+time provided (from Calendar page), skip to Your Info step (step 3)
+  // If only service provided, skip to Stylist (step 1)
+  const initialStep = initialDate && initialTime ? 3 : initialService ? 1 : 0;
+
+  const [currentStep, setCurrentStep] = useState(initialStep);
   const [selections, setSelections] = useState({
-    service: initialService, stylist: "", date: "", time: "",
+    service: initialService, stylist: initialDate && initialTime ? "Shiny Team" : "", 
+    date: initialDate, time: initialTime,
     name: "", email: "", phone: "",
     userId: null as string | null,
   });

@@ -3,41 +3,43 @@
 import React from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { CalendarPicker } from "@/components/booking/CalendarPicker";
-import { useRouter } from "next/navigation";
 import { Reveal } from "@/components/animations/Reveal";
 import { FloatingBooking } from "@/components/sections/FloatingBooking";
+import { CalendarDays } from "lucide-react";
 
 export default function CalendarPage() {
-  const router = useRouter();
-
-  const handleSelect = (date: string, time: string) => {
-    // When a user clicks an available slot, redirect them to the booking page
-    router.push('/booking');
-  };
-
   return (
     <main className="min-h-screen bg-background relative overflow-hidden pb-24">
       <Navbar />
-      <section className="pt-32 pb-16 px-6 max-w-6xl mx-auto">
-        <Reveal>
-          <div className="text-center mb-10">
+
+      {/* ── Hero Header ── */}
+      <section className="pt-32 pb-8 px-6">
+        <div className="max-w-6xl mx-auto text-center">
+          <Reveal>
+            <div className="inline-flex items-center gap-2 bg-pink-50 border border-pink-200 text-pink-600 text-sm font-sans px-4 py-1.5 rounded-full mb-6">
+              <CalendarDays size={15} />
+              Jadwal Real-Time
+            </div>
             <h1 className="text-4xl md:text-5xl font-serif text-charcoal font-bold mb-4">
               Ketersediaan Jadwal
             </h1>
-            <p className="text-lg text-peach-deep font-sans">
-              Pantau jadwal yang sudah terpesan dan temukan waktu kosong untuk Anda. Klik pada slot yang tersedia untuk mulai melakukan reservasi.
+            <p className="text-lg text-gray-500 font-sans max-w-xl mx-auto">
+              Pantau slot yang tersedia dan yang sudah terpesan minggu ini.
+              Klik pada slot <span className="text-green-600 font-medium">hijau</span> untuk langsung melakukan reservasi.
             </p>
-          </div>
-        </Reveal>
-        
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ── Calendar ── */}
+      <section className="px-4 sm:px-6 max-w-6xl mx-auto">
         <Reveal delay={0.1}>
-          <div className="bg-white p-2 sm:p-6 rounded-2xl shadow-lg border border-peach-base/30">
-             <CalendarPicker 
-               selectedDate="" 
-               selectedTime="" 
-               onSelect={handleSelect} 
-             />
-          </div>
+          <CalendarPicker
+            selectedDate=""
+            selectedTime=""
+            onSelect={() => {}}
+            readOnly={true}
+          />
         </Reveal>
       </section>
 
