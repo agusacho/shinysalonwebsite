@@ -12,21 +12,36 @@ const statuses = [
 ];
 
 export function BookingStatusUpdater({
-  bookingId,
-  currentStatus,
+  booking,
 }: {
-  bookingId: string;
-  currentStatus: string;
+  booking: any;
 }) {
   const [isPending, startTransition] = useTransition();
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newStatus = e.target.value;
-    if (newStatus === currentStatus) return;
+    if (newStatus === booking.status) return;
 
     startTransition(async () => {
       try {
-        await updateBookingStatus(bookingId, newStatus);
+        await updateBookingStatus(booking.id, newStatus);
+        
+        // Buka WhatsApp ke customer
+        const phoneRaw = booking.phone || booking.phone_number;
+        if (phoneRaw) {
+          let phone = phoneRaw.replace(/\D/g, "");
+          if (phone.startsWith("0")) phone = "62" + phone.slice(1);
+          
+          let statusText = "";
+          if (newStatus === "confirmed") statusText = "DIKONFIRMASI";
+          else if (newStatus === "completed") statusText = "SELESAI";
+          else if (newStatus === "cancelled") statusText = "DIBATALKAN";
+          else statusText = "MENUNGGU (Pending)";
+
+          const text = encodeURIComponent(`Halo ${booking.name},\n\nStatus booking Anda untuk layanan *${booking.service_id}* pada tanggal *${booking.date}* jam *${booking.time}* telah diubah menjadi: *${statusText}*.\n\nTerima kasih dari Shiny Salon.`);
+          
+          window.open(`https://wa.me/${phone}?text=${text}`, "_blank");
+        }
       } catch (err) {
         console.error("Gagal update status", err);
         alert("Gagal update status booking");
@@ -37,7 +52,7 @@ export function BookingStatusUpdater({
   return (
     <div className="relative flex items-center">
       <select
-        value={currentStatus}
+        value={booking.status}
         onChange={handleChange}
         disabled={isPending}
         className="text-xs font-sans border border-gray-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-[#D4AF37] disabled:opacity-50 appearance-none pr-8 bg-white"

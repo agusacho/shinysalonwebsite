@@ -143,7 +143,7 @@ export default async function BookingsTab({
                       </span>
                     </td>
                     <td className="px-5 py-4">
-                      <BookingStatusUpdater bookingId={b.id} currentStatus={b.status} />
+                      <BookingStatusUpdater booking={b} />
                     </td>
                     <td className="px-5 py-4">
                       {b.attachment_url ? (
