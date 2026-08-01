@@ -5,7 +5,7 @@ import { motion, HTMLMotionProps } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 interface ButtonProps extends HTMLMotionProps<"button"> {
-  variant?: "primary" | "secondary" | "outline";
+  variant?: "primary" | "secondary" | "outline" | "gold";
   size?: "sm" | "md" | "lg";
 }
 
@@ -14,9 +14,10 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const baseStyles = "relative inline-flex items-center justify-center font-sans overflow-hidden transition-colors outline-none focus-visible:ring-2 focus-visible:ring-offset-2";
     
     const variants = {
-      primary: "bg-charcoal text-white rounded-full hover:shadow-lg",
+      primary: "bg-charcoal text-white rounded-full hover:shadow-lg hover:text-charcoal transition-all",
       secondary: "bg-peach-base text-charcoal rounded-full hover:bg-peach-warm",
-      outline: "border-2 border-gold-metallic text-charcoal rounded-full hover:bg-gold-metallic/10",
+      outline: "border-2 border-gray-300 text-gray-500 rounded-full hover:border-gold-metallic hover:text-gold-metallic hover:bg-gold-metallic/5 transition-all",
+      gold: "bg-[#D4AF37] text-white rounded-full hover:bg-[#B38728] hover:shadow-lg transition-colors",
     };
     
     const sizes = {
