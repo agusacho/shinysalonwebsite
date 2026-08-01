@@ -210,7 +210,7 @@ function BookingForm({ content }: { content: Record<string, string> }) {
     return acc;
   }, {});
 
-  const today = new Date().toISOString().split("T")[0];
+
 
   const renderStepContent = () => {
     switch (currentStep) {
