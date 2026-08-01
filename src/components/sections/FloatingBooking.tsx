@@ -108,7 +108,7 @@ export const FloatingBooking = () => {
                     <optgroup label={cat} key={cat}>
                       {items.map(svc => (
                         <option key={svc.id || svc.name} value={svc.name}>
-                          {svc.name} - Rp {svc.price.toLocaleString("id-ID")}
+                          {svc.name} - Rp {Number(svc.price || 0).toLocaleString("id-ID")}
                         </option>
                       ))}
                     </optgroup>
