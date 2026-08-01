@@ -10,11 +10,13 @@ import { cn } from "@/lib/utils";
 
 const categories = ["All", "Hair", "Skin", "Nails"];
 
+type GalleryItem = { id: number | string; category: string; src: string; };
+
 export default function GalleryClient({ content }: { content: Record<string, string> }) {
   const [activeCategory, setActiveCategory] = useState("All");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  const galleryItems = [
+  const galleryItems: GalleryItem[] = content.gallery_items ? JSON.parse(content.gallery_items) : [
     { id: 1, category: "Hair", src: content.gallery_image_1 || "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=800&auto=format&fit=crop" },
     { id: 2, category: "Skin", src: content.gallery_image_2 || "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=800&auto=format&fit=crop" },
     { id: 3, category: "Nails", src: content.gallery_image_3 || "https://images.unsplash.com/photo-1522337660859-02fbefca4702?q=80&w=800&auto=format&fit=crop" },

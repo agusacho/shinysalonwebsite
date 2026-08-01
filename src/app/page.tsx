@@ -11,6 +11,14 @@ export default async function Home() {
   const rawServices = await getContentBySection("Home_Services");
   const content = [...rawHero, ...rawServices].reduce((acc, curr) => ({ ...acc, [curr.id]: curr.value }), {} as Record<string, string>);
 
+  const defaultServices = [
+    { title: content.home_service_1_title || "Hair Services", desc: content.home_service_1_desc || "Potong, Cuci, Blow, Creambath, Hair Mask & Hair Treatment." },
+    { title: content.home_service_2_title || "Keratin Treat", desc: content.home_service_2_desc || "Perawatan Keratin Smoothing dan Filler untuk rambut sehat berkilau." },
+    { title: content.home_service_3_title || "Colouring", desc: content.home_service_3_desc || "Bleaching, Peakaboo, Highlight, dan Ombre dengan hasil memukau." }
+  ];
+
+  const homeServices = content.home_services_list ? JSON.parse(content.home_services_list) : defaultServices;
+
   return (
     <main className="min-h-screen bg-background relative">
       <LiquidPreloader />
@@ -29,11 +37,7 @@ export default async function Home() {
           </Reveal>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { title: content.home_service_1_title || "Hair Services", desc: content.home_service_1_desc || "Potong, Cuci, Blow, Creambath, Hair Mask & Hair Treatment." },
-              { title: content.home_service_2_title || "Keratin Treat", desc: content.home_service_2_desc || "Perawatan Keratin Smoothing dan Filler untuk rambut sehat berkilau." },
-              { title: content.home_service_3_title || "Colouring", desc: content.home_service_3_desc || "Bleaching, Peakaboo, Highlight, dan Ombre dengan hasil memukau." }
-            ].map((service, i) => (
+            {homeServices.map((service: any, i: number) => (
               <Reveal key={i} delay={i * 0.2}>
                 <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-lg transition-shadow border border-peach-base group relative overflow-hidden">
                   <div className="absolute inset-0 bg-gold-gradient opacity-0 group-hover:opacity-10 transition-opacity" />

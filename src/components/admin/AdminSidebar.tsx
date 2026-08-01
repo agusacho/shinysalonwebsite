@@ -4,15 +4,16 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
   LayoutDashboard, Calendar, Scissors,
-  MessageSquare, LogOut, ChevronRight, FileText
+  MessageSquare, LogOut, ChevronRight, FileText, Briefcase, Settings
 } from "lucide-react";
 
 const navItems = [
   { label: "Dashboard", tab: "dashboard", icon: LayoutDashboard },
   { label: "Bookings", tab: "bookings", icon: Calendar },
-  { label: "Layanan", tab: "services", icon: Scissors },
+  { label: "Services", tab: "services", icon: Briefcase },
   { label: "Pesan Kontak", tab: "contacts", icon: MessageSquare },
   { label: "Web Content", tab: "content", icon: FileText },
+  { label: "Settings", tab: "settings", icon: Settings },
 ];
 
 export function AdminSidebar({ userEmail }: { userEmail: string }) {

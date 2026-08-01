@@ -6,14 +6,19 @@ export default async function ContentTab() {
 
   // Group content by section
   const sections: Record<string, any[]> = {
-    About: [] // Guarantee About tab exists
+    Home: [],
+    About: [],
+    Gallery: [],
+    Contact: []
   };
   
   for (const item of allContent) {
-    if (!sections[item.section]) {
-      sections[item.section] = [];
+    // Map Hero and Home_Services to Home for simplicity in the sidebar
+    const tabName = item.section === "Hero" || item.section === "Home_Services" ? "Home" : item.section;
+    if (!sections[tabName]) {
+      sections[tabName] = [];
     }
-    sections[item.section].push(item);
+    sections[tabName].push(item);
   }
 
   return (

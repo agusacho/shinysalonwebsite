@@ -4,6 +4,8 @@ import { useState } from "react";
 import { updateContent, uploadImageAndUpdateContent } from "@/app/actions/content";
 import { Button } from "@/components/ui/Button";
 import AboutContentEditor from "./AboutContentEditor";
+import HomeContentEditor from "./HomeContentEditor";
+import GalleryContentEditor from "./GalleryContentEditor";
 
 type ContentItem = {
   id: string;
@@ -14,41 +16,49 @@ type ContentItem = {
 };
 
 export default function ContentEditor({ initialSections }: { initialSections: Record<string, ContentItem[]> }) {
-  const [activeTab, setActiveTab] = useState(Object.keys(initialSections)[0] || "");
+  const availableTabs = Object.keys(initialSections);
+  const [activeTab, setActiveTab] = useState<string>(availableTabs.length > 0 ? availableTabs[0] : "");
   const [sections, setSections] = useState(initialSections);
   const [loading, setLoading] = useState<Record<string, boolean>>({});
 
   const handleTextChange = (id: string, value: string) => {
     setSections(prev => {
-      const newSections = { ...prev };
-      const sec = newSections[activeTab].map(item => 
-        item.id === id ? { ...item, value } : item
-      );
-      newSections[activeTab] = sec;
-      return newSections;
+      const next = { ...prev };
+      const section = next[activeTab];
+      const itemIndex = section.findIndex(item => item.id === id);
+      if (itemIndex > -1) {
+        section[itemIndex] = { ...section[itemIndex], value };
+      }
+      return next;
     });
   };
 
   const saveText = async (id: string, value: string) => {
     setLoading(prev => ({ ...prev, [id]: true }));
     const result = await updateContent(id, value);
-    if (result.error) alert(result.error);
-    else alert("Content updated successfully!");
+    if (result.error) {
+      alert(result.error);
+    } else {
+      alert("Content updated successfully!");
+    }
     setLoading(prev => ({ ...prev, [id]: false }));
   };
 
   const uploadImage = async (id: string, file: File) => {
     setLoading(prev => ({ ...prev, [id]: true }));
+    
     const formData = new FormData();
     formData.append("file", file);
     
     const result = await uploadImageAndUpdateContent(id, formData);
+    
     if (result.error) {
       alert(result.error);
     } else if (result.url) {
       handleTextChange(id, result.url);
       alert("Image updated successfully!");
     }
+    
     setLoading(prev => ({ ...prev, [id]: false }));
   };
 
@@ -63,20 +73,24 @@ export default function ContentEditor({ initialSections }: { initialSections: Re
             onClick={() => setActiveTab(tab)}
             className={`px-6 py-4 text-left font-medium transition-colors ${activeTab === tab ? "bg-white text-gold-metallic border-l-4 border-gold-metallic" : "text-gray-600 hover:bg-white/50 border-l-4 border-transparent"}`}
           >
-            {tab}
+            {tab.replace("_", " ")}
           </button>
         ))}
       </div>
       
       <div className="flex-1 bg-white">
         {activeTab === "About" ? (
-          <AboutContentEditor initialContent={sections["About"]} />
+          <AboutContentEditor initialContent={sections["About"] || []} />
+        ) : activeTab === "Home" || activeTab === "Hero" || activeTab === "Home_Services" ? (
+          <HomeContentEditor initialContent={[...(sections["Hero"] || []), ...(sections["Home_Services"] || [])]} />
+        ) : activeTab === "Gallery" ? (
+          <GalleryContentEditor initialContent={sections["Gallery"] || []} />
         ) : (
           <div className="p-8">
             <h2 className="text-2xl font-serif text-charcoal mb-6">{activeTab} Content</h2>
             
             <div className="space-y-8">
-              {sections[activeTab].map(item => (
+              {(sections[activeTab] || []).map(item => (
                 <div key={item.id} className="pb-8 border-b border-gray-100 last:border-0">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     {item.id.replace(activeTab.toLowerCase() + "_", "").replace(/_/g, " ").toUpperCase()}

@@ -19,24 +19,6 @@ import { Suspense } from "react";
 
 const steps = ["Service", "Stylist", "Date & Time", "Your Info", "Lampiran", "Konfirmasi"];
 
-const SERVICES = [
-  { name: "Potong+Cuci+Blow+Tonic+Vit", price: "40K", category: "Hair Services" },
-  { name: "Cuci+Blow+Tonic+Vit", price: "30K", category: "Hair Services" },
-  { name: "Cuci+Catok+Tonic+Vit", price: "40K-50K", category: "Hair Services" },
-  { name: "Creambath+Blow+Tonic+Vit", price: "60K", category: "Hair Services" },
-  { name: "Hair Mask+Blow+Tonic+Vit", price: "70K", category: "Hair Services" },
-  { name: "Hair Treatment+Blow+Tonic+Vit", price: "85K", category: "Hair Services" },
-  { name: "Hair Mask Keratin+Blow+Tonic+Vit", price: "80K", category: "Keratin Treat" },
-  { name: "Smoothing Keratin Short", price: "300K-400K", category: "Keratin Treat" },
-  { name: "Smoothing Keratin Medium", price: "400K-500K", category: "Keratin Treat" },
-  { name: "Smoothing Keratin Long", price: "500K-600K", category: "Keratin Treat" },
-  { name: "Filler Keratin", price: "350K-650K", category: "Keratin Treat" },
-  { name: "Bleaching all Hair", price: "150K-300K", category: "Colouring" },
-  { name: "Colouring all Hair", price: "120K-300K", category: "Colouring" },
-  { name: "Peakaboo or Highlight", price: "220K-450K", category: "Colouring" },
-  { name: "Ombre", price: "250K-500K", category: "Colouring" },
-];
-
 const STYLISTS = [{ name: "Shiny Team", initial: "S" }];
 const TIMES = ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00"];
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -54,6 +36,7 @@ function BookingForm() {
   // If only service provided, skip to Stylist (step 1)
   const initialStep = initialDate && initialTime ? 3 : initialService ? 1 : 0;
 
+  const [dbServices, setDbServices] = useState<any[]>([]);
   const [currentStep, setCurrentStep] = useState(initialStep);
   const [selections, setSelections] = useState({
     service: initialService, stylist: initialDate && initialTime ? "Shiny Team" : "", 
@@ -75,6 +58,8 @@ function BookingForm() {
       baseUrl: process.env.NEXT_PUBLIC_INSFORGE_URL!,
       anonKey: process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY!,
     });
+    
+    // Fetch user
     client.auth.getCurrentUser().then(({ data }) => {
       if (data?.user) {
         setSelections(s => ({
@@ -85,6 +70,16 @@ function BookingForm() {
         }));
       }
     });
+
+    // Fetch active services
+    client.database
+      .from("services")
+      .select("*")
+      .eq("is_active", true)
+      .order("category")
+      .then(({ data }) => {
+        if (data) setDbServices(data);
+      });
   }, []);
 
   const handleFile = (selected: File) => {
@@ -208,7 +203,7 @@ function BookingForm() {
 
   const prevStep = () => { setError(""); if (currentStep > 0) setCurrentStep(c => c - 1); };
 
-  const groupedServices = SERVICES.reduce<Record<string, typeof SERVICES>>((acc, svc) => {
+  const groupedServices = dbServices.reduce<Record<string, any[]>>((acc, svc) => {
     if (!acc[svc.category]) acc[svc.category] = [];
     acc[svc.category].push(svc);
     return acc;
@@ -234,7 +229,7 @@ function BookingForm() {
                       <h4 className="font-sans font-medium text-charcoal text-sm">{svc.name}</h4>
                       <span className={cn("font-bold font-sans text-sm ml-4 shrink-0",
                         selections.service === svc.name ? "text-gold-metallic" : "text-peach-deep")}>
-                        Rp {svc.price}
+                        Rp {svc.price.toLocaleString("id-ID")}
                       </span>
                     </div>
                   ))}
