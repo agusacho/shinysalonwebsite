@@ -496,7 +496,7 @@ function BookingForm({ content }: { content: Record<string, string> }) {
                   <Button 
                     className="w-full sm:w-auto bg-[#25D366] hover:bg-[#128C7E] text-white border-none shadow-md"
                     onClick={() => {
-                      const adminPhone = content?.contact_phone?.replace(/\D/g, '') || "6281234567890";
+                      const adminPhone = "6285811467467";
                       const text = encodeURIComponent(`Halo Shiny Salon, saya ingin konfirmasi booking:\n\n*Nama:* ${selections.name}\n*Layanan:* ${selections.service}\n*Stylist:* ${selections.stylist}\n*Tanggal:* ${selections.date}\n*Jam:* ${selections.time}\n*No. HP:* ${selections.phone}\n*Email:* ${selections.email}\n\nTerima kasih!`);
                       window.open(`https://wa.me/${adminPhone}?text=${text}`, "_blank");
                     }}

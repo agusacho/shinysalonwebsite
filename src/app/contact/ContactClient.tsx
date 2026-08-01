@@ -96,7 +96,7 @@ export default function Contact({ content }: { content: Record<string, string> }
                   <h3 className="text-xl font-serif text-charcoal mb-1">Phone & Email</h3>
                   <p className="text-gray-600 font-sans whitespace-pre-wrap">
                     {content.contact_email || "hello@shinysalon.com"}<br/>
-                    {content.contact_phone || "+62 812-3456-7890"}
+                    {"+62 858-1146-7467"}
                   </p>
                 </div>
               </div>
