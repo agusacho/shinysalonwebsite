@@ -56,6 +56,17 @@ function BookingForm({ content }: { content: Record<string, string> }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    if (currentStep === steps.length) {
+      const adminPhone = "6285811467467";
+      const text = encodeURIComponent(`Halo Shiny Salon, saya ingin konfirmasi booking:\n\n*Nama:* ${selections.name}\n*Layanan:* ${selections.service}\n*Stylist:* ${selections.stylist}\n*Tanggal:* ${selections.date}\n*Jam:* ${selections.time}\n*No. HP:* ${selections.phone}\n*Email:* ${selections.email}\n\nTerima kasih!`);
+      const timeoutId = setTimeout(() => {
+        window.location.href = `https://wa.me/${adminPhone}?text=${text}`;
+      }, 1500);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [currentStep, selections]);
+
+  useEffect(() => {
     const client = createBrowserClient({
       baseUrl: process.env.NEXT_PUBLIC_INSFORGE_URL!,
       anonKey: process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY!,
@@ -497,7 +508,7 @@ function BookingForm({ content }: { content: Record<string, string> }) {
                 <div className="my-8 p-6 bg-gold-metallic/5 border border-gold-metallic/20 rounded-xl">
                   <h3 className="font-serif text-lg text-charcoal mb-2">Langkah Terakhir: Konfirmasi via WhatsApp</h3>
                   <p className="text-sm text-gray-600 font-sans mb-4">
-                    Mohon klik tombol di bawah ini untuk mengirim detail booking Anda ke Admin kami via WhatsApp.
+                    Anda akan dialihkan ke WhatsApp secara otomatis dalam beberapa detik. Jika tidak dialihkan, silakan klik tombol di bawah ini.
                   </p>
                   <Button 
                     className="w-full sm:w-auto bg-[#25D366] hover:bg-[#128C7E] text-white border-none shadow-md"
