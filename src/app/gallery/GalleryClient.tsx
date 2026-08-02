@@ -79,13 +79,21 @@ export default function GalleryClient({ content }: { content: Record<string, str
                 className="break-inside-avoid cursor-pointer overflow-hidden rounded-2xl group"
                 onClick={() => setSelectedImage(item.src)}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img 
-                  src={item.src} 
-                  alt={item.category} 
-                  className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
-                  loading="lazy"
-                />
+                {item.src.match(/\.(mp4|webm|ogg)$/i) ? (
+                  <video 
+                    src={item.src} 
+                    className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
+                    muted loop autoPlay playsInline
+                  />
+                ) : (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img 
+                    src={item.src} 
+                    alt={item.category} 
+                    className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
+                    loading="lazy"
+                  />
+                )}
               </motion.div>
             ))}
           </AnimatePresence>
@@ -108,15 +116,27 @@ export default function GalleryClient({ content }: { content: Record<string, str
             >
               <X size={32} />
             </button>
-            <motion.img
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.9 }}
-              src={selectedImage}
-              alt="Enlarged view"
-              className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            />
+            {selectedImage.match(/\.(mp4|webm|ogg)$/i) ? (
+              <motion.video
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0.9 }}
+                src={selectedImage}
+                className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+                controls autoPlay playsInline
+                onClick={(e) => e.stopPropagation()}
+              />
+            ) : (
+              <motion.img
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0.9 }}
+                src={selectedImage}
+                alt="Enlarged view"
+                className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+              />
+            )}
           </motion.div>
         )}
       </AnimatePresence>

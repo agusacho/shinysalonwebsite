@@ -96,16 +96,20 @@ export default function GalleryContentEditor({ initialContent }: { initialConten
               
               <div className="aspect-square bg-gray-200 rounded-lg overflow-hidden border border-gray-300 relative">
                 {item.src ? (
-                  <img src={item.src} alt="Gallery" className="w-full h-full object-cover" />
+                  item.src.match(/\.(mp4|webm|ogg)$/i) ? (
+                    <video src={item.src} className="w-full h-full object-cover" muted loop autoPlay playsInline />
+                  ) : (
+                    <img src={item.src} alt="Gallery" className="w-full h-full object-cover" />
+                  )
                 ) : (
-                  <div className="flex items-center justify-center w-full h-full text-gray-400">No Image</div>
+                  <div className="flex items-center justify-center w-full h-full text-gray-400">No Media</div>
                 )}
               </div>
 
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Upload New Photo</label>
-                  <input type="file" accept="image/*" onChange={(e) => { if(e.target.files?.[0]) handleUploadGalleryImage(index, e.target.files[0]) }} className="text-xs w-full file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-gold-light file:text-gold-metallic" disabled={uploadingImageIndex === index} />
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Upload New Media</label>
+                  <input type="file" accept="image/*,video/*" onChange={(e) => { if(e.target.files?.[0]) handleUploadGalleryImage(index, e.target.files[0]) }} className="text-xs w-full file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-gold-light file:text-gold-metallic" disabled={uploadingImageIndex === index} />
                   {uploadingImageIndex === index && <p className="text-xs text-gold-metallic mt-1">Uploading...</p>}
                 </div>
                 <div>
