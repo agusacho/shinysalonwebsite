@@ -41,7 +41,7 @@ export default function AboutClient({ content }: { content: AboutContent }) {
       <section className="pt-32 pb-20 px-6 relative bg-peach-base/20">
         <div className="max-w-4xl mx-auto text-center">
           <Reveal>
-            <h1 className="text-5xl md:text-6xl font-serif text-charcoal font-bold mb-6">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif text-charcoal font-bold mb-6">
               {content.about_title || "Our Story"}
             </h1>
             <p className="text-xl text-peach-deep font-sans mb-4">

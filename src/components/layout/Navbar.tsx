@@ -48,8 +48,8 @@ export const Navbar = () => {
          SHINY SALON | WA: 085811467467
       </div>
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between w-full">
-        <Link href="/" className="flex items-center gap-3 font-serif text-2xl tracking-widest text-gold-gradient font-bold">
-          <Image src="/logo.png" alt="Shiny Salon Logo" width={48} height={48} className="object-contain drop-shadow-md" />
+        <Link href="/" className="flex items-center gap-3 font-serif text-xl md:text-2xl tracking-widest text-gold-gradient font-bold">
+          <Image src="/logo.png" alt="Shiny Salon Logo" width={48} height={48} className="object-contain drop-shadow-md w-10 h-10 md:w-12 md:h-12" />
           SHINY SALON
         </Link>
 

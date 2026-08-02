@@ -135,7 +135,7 @@ export default function ServicesClient({ content }: { content: Record<string, st
       <section className="pt-32 pb-16 px-6 relative">
         <div className="max-w-4xl mx-auto text-center">
           <Reveal>
-            <h1 className="text-5xl md:text-6xl font-serif text-charcoal font-bold mb-4">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif text-charcoal font-bold mb-4">
               {content.services_title || "Layanan Kami"}
             </h1>
             <p className="text-xl text-peach-deep font-sans">

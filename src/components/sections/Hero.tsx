@@ -51,7 +51,7 @@ export const Hero = ({ content }: HeroProps) => {
           {content.hero_subtitle || "Luminous Elegance."}
         </motion.p>
         
-        <h1 className="text-5xl md:text-7xl font-serif text-charcoal font-bold leading-tight mb-8 min-h-[1.2em]">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-charcoal font-bold leading-tight mb-8 min-h-[1.2em]">
           {textToType.map((char, index) => (
             <motion.span
               key={index}
