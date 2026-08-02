@@ -22,26 +22,25 @@ export function BookingStatusUpdater({
     const newStatus = e.target.value;
     if (newStatus === booking.status) return;
 
+    const phoneRaw = booking.phone || booking.phone_number;
+    if (phoneRaw) {
+      let phone = phoneRaw.replace(/\D/g, "");
+      if (phone.startsWith("0")) phone = "62" + phone.slice(1);
+      
+      let statusText = "";
+      if (newStatus === "confirmed") statusText = "DIKONFIRMASI";
+      else if (newStatus === "completed") statusText = "SELESAI";
+      else if (newStatus === "cancelled") statusText = "DIBATALKAN";
+      else statusText = "MENUNGGU (Pending)";
+
+      const text = encodeURIComponent(`Halo ${booking.name},\n\nStatus booking Anda untuk layanan *${booking.service_id}* pada tanggal *${booking.date}* jam *${booking.time}* telah diubah menjadi: *${statusText}*.\n\nTerima kasih dari Shiny Salon.`);
+      
+      window.open(`https://wa.me/${phone}?text=${text}`, "_blank");
+    }
+
     startTransition(async () => {
       try {
         await updateBookingStatus(booking.id, newStatus);
-        
-        // Buka WhatsApp ke customer
-        const phoneRaw = booking.phone || booking.phone_number;
-        if (phoneRaw) {
-          let phone = phoneRaw.replace(/\D/g, "");
-          if (phone.startsWith("0")) phone = "62" + phone.slice(1);
-          
-          let statusText = "";
-          if (newStatus === "confirmed") statusText = "DIKONFIRMASI";
-          else if (newStatus === "completed") statusText = "SELESAI";
-          else if (newStatus === "cancelled") statusText = "DIBATALKAN";
-          else statusText = "MENUNGGU (Pending)";
-
-          const text = encodeURIComponent(`Halo ${booking.name},\n\nStatus booking Anda untuk layanan *${booking.service_id}* pada tanggal *${booking.date}* jam *${booking.time}* telah diubah menjadi: *${statusText}*.\n\nTerima kasih dari Shiny Salon.`);
-          
-          window.open(`https://wa.me/${phone}?text=${text}`, "_blank");
-        }
       } catch (err) {
         console.error("Gagal update status", err);
         alert("Gagal update status booking");
