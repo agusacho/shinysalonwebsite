@@ -12,12 +12,12 @@ type ContentItem = {
 };
 
 const defaultGalleryItems = [
-  { id: 1, category: "Hair", src: "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=800&auto=format&fit=crop" },
-  { id: 2, category: "Skin", src: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=800&auto=format&fit=crop" },
-  { id: 3, category: "Nails", src: "https://images.unsplash.com/photo-1522337660859-02fbefca4702?q=80&w=800&auto=format&fit=crop" },
-  { id: 4, category: "Hair", src: "https://images.unsplash.com/photo-1595476108010-b4d1f10d5e43?q=80&w=800&auto=format&fit=crop" },
-  { id: 5, category: "Skin", src: "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?q=80&w=800&auto=format&fit=crop" },
-  { id: 6, category: "Hair", src: "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?q=80&w=800&auto=format&fit=crop" },
+  { id: 1, category: "Hair Cuts", src: "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=800&auto=format&fit=crop" },
+  { id: 2, category: "Hair Stylist", src: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=800&auto=format&fit=crop" },
+  { id: 3, category: "Coloring", src: "https://images.unsplash.com/photo-1522337660859-02fbefca4702?q=80&w=800&auto=format&fit=crop" },
+  { id: 4, category: "Smoothing", src: "https://images.unsplash.com/photo-1595476108010-b4d1f10d5e43?q=80&w=800&auto=format&fit=crop" },
+  { id: 5, category: "Hair Cuts", src: "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?q=80&w=800&auto=format&fit=crop" },
+  { id: 6, category: "Hair Stylist", src: "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?q=80&w=800&auto=format&fit=crop" },
 ];
 
 export default function GalleryContentEditor({ initialContent }: { initialContent: ContentItem[] }) {
@@ -115,9 +115,10 @@ export default function GalleryContentEditor({ initialContent }: { initialConten
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1">Category</label>
                   <select value={item.category} onChange={e => { const g = [...gallery]; g[index].category = e.target.value; setGallery(g); }} className="w-full px-2 py-2 rounded-md border text-sm">
-                    <option value="Hair">Hair</option>
-                    <option value="Skin">Skin</option>
-                    <option value="Nails">Nails</option>
+                    <option value="Hair Cuts">Hair Cuts</option>
+                    <option value="Hair Stylist">Hair Stylist</option>
+                    <option value="Coloring">Coloring</option>
+                    <option value="Smoothing">Smoothing</option>
                   </select>
                 </div>
               </div>

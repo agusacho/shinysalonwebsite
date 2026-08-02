@@ -8,7 +8,7 @@ import { Reveal } from "@/components/animations/Reveal";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const categories = ["All", "Hair", "Skin", "Nails"];
+const categories = ["All", "Hair Cuts", "Hair Stylist", "Coloring", "Smoothing"];
 
 type GalleryItem = { id: number | string; category: string; src: string; };
 
