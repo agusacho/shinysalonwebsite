@@ -27,7 +27,10 @@ export const FloatingBooking = () => {
             anonKey: process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY!,
           });
           const { data } = await client.database.from("services").select("*");
-          if (data) setServices(data);
+          if (data) {
+            console.log("SERVICES FROM DB:", data[0]);
+            setServices(data);
+          }
         } catch (err) {
           console.error("Failed to load services", err);
         } finally {
@@ -106,11 +109,16 @@ export const FloatingBooking = () => {
                   <option value="">-- Pilih Layanan --</option>
                   {Object.entries(groupedServices).map(([cat, items]) => (
                     <optgroup label={cat} key={cat}>
-                      {items.map(svc => (
-                        <option key={svc.id || svc.name} value={svc.name}>
-                          {svc.name} - Rp {Number(String(svc.price || "0").replace(/\D/g, "")).toLocaleString("id-ID")}
-                        </option>
-                      ))}
+                      {items.map(svc => {
+                        const from = Number(svc.price_from || 0).toLocaleString("id-ID");
+                        const to = svc.price_to ? Number(svc.price_to).toLocaleString("id-ID") : null;
+                        const priceStr = to ? `${from} - ${to}` : from;
+                        return (
+                          <option key={svc.id || svc.name} value={svc.name}>
+                            {svc.name} - Rp {priceStr}
+                          </option>
+                        );
+                      })}
                     </optgroup>
                   ))}
                 </select>

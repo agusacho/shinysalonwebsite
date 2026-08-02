@@ -231,7 +231,13 @@ function BookingForm({ content }: { content: Record<string, string> }) {
                       <h4 className="font-sans font-medium text-charcoal text-sm">{svc.name}</h4>
                       <span className={cn("font-bold font-sans text-sm ml-4 shrink-0",
                         selections.service === svc.name ? "text-gold-metallic" : "text-peach-deep")}>
-                        Rp {Number(String(svc.price || "0").replace(/\D/g, "")).toLocaleString("id-ID")}
+                        Rp {
+                          (() => {
+                            const from = Number(svc.price_from || 0).toLocaleString("id-ID");
+                            const to = svc.price_to ? Number(svc.price_to).toLocaleString("id-ID") : null;
+                            return to ? `${from} - ${to}` : from;
+                          })()
+                        }
                       </span>
                     </div>
                   ))}

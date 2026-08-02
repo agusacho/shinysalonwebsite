@@ -9,7 +9,8 @@ type Service = {
   name: string;
   description: string | null;
   category: string;
-  price: number;
+  price_from: number;
+  price_to: number | null;
   duration_minutes: number;
   is_active: boolean;
 };
@@ -51,7 +52,8 @@ export default function ServicesTab() {
     setFormData({
       name: "",
       category: "Hair",
-      price: 0,
+      price_from: 0,
+      price_to: null,
       duration_minutes: 60,
       is_active: true,
       description: ""
@@ -140,8 +142,12 @@ export default function ServicesTab() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Price (Rp)</label>
-              <input type="number" value={formData.price || 0} onChange={e => setFormData({...formData, price: Number(e.target.value)})} className="w-full px-3 py-2 rounded border" />
+              <label className="block text-sm font-medium text-gray-700 mb-1">Price From (Rp)</label>
+              <input type="number" value={formData.price_from || 0} onChange={e => setFormData({...formData, price_from: Number(e.target.value)})} className="w-full px-3 py-2 rounded border" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Price To (Rp, Optional)</label>
+              <input type="number" value={formData.price_to || ""} onChange={e => setFormData({...formData, price_to: e.target.value ? Number(e.target.value) : null})} className="w-full px-3 py-2 rounded border" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Duration (minutes)</label>
@@ -185,7 +191,13 @@ export default function ServicesTab() {
                   {svc.description && <p className="text-xs text-gray-500 mt-1">{svc.description}</p>}
                 </td>
                 <td className="p-4 text-sm text-gray-600">{svc.duration_minutes} mins</td>
-                <td className="p-4 text-sm text-gray-600">{Number(String(svc.price || "0").replace(/\D/g, "")).toLocaleString("id-ID")}</td>
+                <td className="p-4 text-sm text-gray-600">
+                  {(() => {
+                    const from = Number(svc.price_from || 0).toLocaleString("id-ID");
+                    const to = svc.price_to ? Number(svc.price_to).toLocaleString("id-ID") : null;
+                    return to ? `${from} - ${to}` : from;
+                  })()}
+                </td>
                 <td className="p-4 text-right space-x-2">
                   <button onClick={() => handleEdit(svc)} className="text-gold-metallic hover:underline text-sm font-medium px-2 py-1">Edit</button>
                   <button onClick={() => handleDelete(svc.id)} className="text-red-500 hover:underline text-sm font-medium px-2 py-1">Delete</button>
