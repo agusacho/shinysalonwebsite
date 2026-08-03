@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/Button";
 import AboutContentEditor from "./AboutContentEditor";
 import HomeContentEditor from "./HomeContentEditor";
 import GalleryContentEditor from "./GalleryContentEditor";
+import ServicesContentEditor from "./ServicesContentEditor";
+import ContactContentEditor from "./ContactContentEditor";
 
 type ContentItem = {
   id: string;
@@ -85,6 +87,10 @@ export default function ContentEditor({ initialSections }: { initialSections: Re
           <HomeContentEditor initialContent={[...(sections["Hero"] || []), ...(sections["Home_Services"] || [])]} />
         ) : activeTab === "Gallery" ? (
           <GalleryContentEditor initialContent={sections["Gallery"] || []} />
+        ) : activeTab === "Services" ? (
+          <ServicesContentEditor initialContent={sections["Services"] || []} />
+        ) : activeTab === "Contact" ? (
+          <ContactContentEditor initialContent={sections["Contact"] || []} />
         ) : (
           <div className="p-8">
             <h2 className="text-2xl font-serif text-charcoal mb-6">{activeTab} Content</h2>

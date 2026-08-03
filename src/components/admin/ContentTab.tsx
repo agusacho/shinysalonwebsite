@@ -4,11 +4,11 @@ import ContentEditor from "@/components/admin/ContentEditor";
 export default async function ContentTab() {
   const allContent = await getAllContent();
 
-  // Group content by section
   const sections: Record<string, any[]> = {
     Home: [],
     About: [],
     Gallery: [],
+    Services: [],
     Contact: []
   };
   
