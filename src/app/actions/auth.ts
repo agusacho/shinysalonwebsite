@@ -56,7 +56,33 @@ export async function signOut() {
     const auth = await getAuthActions();
     await auth.signOut();
     return { success: true };
-  } catch (err: any) {
+} catch (err: any) {
     return { error: { message: err.message || "Gagal keluar" } };
+  }
+}
+
+export async function signInWithGoogle(origin: string) {
+  try {
+    const cookieStore = await cookies();
+    // We instantiate raw client to access .auth directly because getAuthActions only exposes wrappers
+    // for password and sign up.
+    const { createServerClient } = await import("@insforge/sdk/ssr");
+    const insforge = createServerClient({
+      baseUrl: process.env.NEXT_PUBLIC_INSFORGE_URL!,
+      anonKey: process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY!,
+      cookies: cookieStore,
+    });
+
+    const { data, error } = await insforge.auth.signInWithOAuth('google', {
+      redirectTo: `${origin}/api/auth/callback`,
+    });
+
+    if (error) {
+      return { error: { message: error.message } };
+    }
+    
+    return { url: data?.url };
+  } catch (err: any) {
+    return { error: { message: err.message || "Gagal login Google" } };
   }
 }
