@@ -4,13 +4,14 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
   LayoutDashboard, Calendar, Scissors,
-  MessageSquare, LogOut, ChevronRight, FileText, Briefcase, Settings
+  MessageSquare, LogOut, ChevronRight, FileText, Briefcase, Settings, Users
 } from "lucide-react";
 
 const navItems = [
   { label: "Dashboard", tab: "dashboard", icon: LayoutDashboard },
   { label: "Bookings", tab: "bookings", icon: Calendar },
   { label: "Services", tab: "services", icon: Briefcase },
+  { label: "Pelanggan", tab: "customers", icon: Users },
   { label: "Pesan Kontak", tab: "contacts", icon: MessageSquare },
   { label: "Web Content", tab: "content", icon: FileText },
   { label: "Settings", tab: "settings", icon: Settings },

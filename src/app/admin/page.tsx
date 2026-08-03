@@ -3,6 +3,7 @@ import BookingsTab from "@/components/admin/BookingsTab";
 import ServicesTab from "@/components/admin/ServicesTab";
 import ContactsTab from "@/components/admin/ContactsTab";
 import ContentTab from "@/components/admin/ContentTab";
+import CustomersTab from "@/components/admin/CustomersTab";
 
 export default async function AdminPage({
   searchParams,
@@ -19,6 +20,7 @@ export default async function AdminPage({
         <BookingsTab searchParams={{ status: params.status, q: params.q }} />
       )}
       {currentTab === "services" && <ServicesTab />}
+      {currentTab === "customers" && <CustomersTab />}
       {currentTab === "contacts" && <ContactsTab />}
       {currentTab === "content" && <ContentTab />}
     </>
